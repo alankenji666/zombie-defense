@@ -40,13 +40,14 @@ let LOADER; // Será inicializado no init
 // Categories mapping (Subsets for performance indexing)
 const CATEGORIES = {
     floor: ['block-', 'road-', 'water-'],
-    nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass'],
-    struct: ['wall', 'roof', 'stairs', 'fence', 'pillar', 'door', 'column', 'brick'],
-    mobs: ['animal-', 'character-']
+    nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass', 'plant'],
+    struct: ['wall', 'roof', 'stairs', 'fence', 'pillar', 'door', 'column', 'brick', 'tent', 'campfire', 'house', 'building'],
+    mobs: ['animal-', 'character-'],
+    items: ['tool-', 'axe', 'pickaxe', 'backpack', 'bedroll', 'bottle', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'radio', 'raft', 'torch', 'watch', 'bucket', 'chest', 'crate']
 };
 
 const THEMES = {
-    survival: ['axe', 'backpack', 'bedroll', 'bottle', 'campfire', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'pickaxe', 'radio', 'raft', 'tent', 'torch', 'watch'],
+    survival: ['axe', 'backpack', 'bedroll', 'bottle', 'campfire', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'pickaxe', 'radio', 'raft', 'tent', 'torch', 'watch', 'tool-'],
     fantasy: ['stall', 'banner', 'barrel', 'well', 'chimney', 'sign', 'cart', 'crane', 'ladder', 'scaffold'],
     graveyard: ['altar-', 'candle', 'coffin', 'cross', 'crypt', 'gravestone', 'tomb'],
     nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass'],

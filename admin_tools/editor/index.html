@@ -225,13 +225,23 @@
             </div>
             
             <div class="tabs-header">
-                <button class="tab-btn active" onclick="switchTab('floor')">Pisos</button>
-                <button class="tab-btn" onclick="switchTab('nature')">Natureza</button>
-                <button class="tab-btn" onclick="switchTab('struct')">Construção</button>
-                <button class="tab-btn" onclick="switchTab('mobs')">Mobs</button>
+                <button class="tab-btn active" data-category="floor" onclick="switchTab('floor')">Pisos</button>
+                <button class="tab-btn" data-category="nature" onclick="switchTab('nature')">Natureza</button>
+                <button class="tab-btn" data-category="struct" onclick="switchTab('struct')">Construção</button>
+                <button class="tab-btn" data-category="items" onclick="switchTab('items')">Itens</button>
+                <button class="tab-btn" data-category="mobs" onclick="switchTab('mobs')">Mobs</button>
             </div>
 
-            <div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px;">
+                <select id="theme-filter" onchange="renderAssetList(document.querySelector('.tab-btn.active').getAttribute('data-category'))" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 12px; outline: none; cursor: pointer;">
+                    <option value="all">Todos os Temas</option>
+                    <option value="survival">Sobrevivência</option>
+                    <option value="fantasy">Vila Fantasia</option>
+                    <option value="graveyard">Cemitério</option>
+                    <option value="nature">Natureza</option>
+                    <option value="mobs">Animais & Personagens</option>
+                    <option value="platformer">Plataforma / Base</option>
+                </select>
                 <input type="text" id="asset-search" placeholder="🔍 Buscar item..." style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #fff; font-size: 12px; outline: none; transition: all 0.3s; box-sizing: border-box;">
             </div>
 
