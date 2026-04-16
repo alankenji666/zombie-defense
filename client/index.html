@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ws: wss:;">
+    <title>Survival Island MVP</title>
+    <!-- Imports font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <!-- Natively link CSS -->
+    <link rel="stylesheet" href="/src/style.css">
+  </head>
+  <body>
+    <div id="game-container">
+      
+      <!-- Story Screen -->
+      <div id="story-screen" class="overlay">
+        <h1 class="title">PERDIDO</h1>
+        <p class="story-text">
+          Você acorda sentindo a areia molhada no rosto, ao lado de destroços de um bote rasgado.
+        </p>
+        <p class="story-text">
+          Nenhum sinal de outros sobreviventes do voo. Sem memórias, sua única certeza é que a fome dói.
+        </p>
+        <p class="story-text">
+          Encontre comida ou não passe da primeira noite.
+        </p>
+        <div class="login-box">
+            <input type="text" id="player-name-input" placeholder="DIGITE SEU NOME..." maxlength="12">
+        </div>
+        <button id="btn-start" class="btn">ACORDAR</button>
+      </div>
+
+      <!-- Game UI Layer -->
+      <div id="ui-layer" class="hidden">
+        <div id="top-bar">
+          <div class="stat-box">
+            <span class="icon">❤️</span>
+            <div class="bar-bg"><div id="health-bar" class="bar-fill health"></div></div>
+          </div>
+          <div class="stat-box">
+            <span class="icon">🍖</span>
+            <div class="bar-bg"><div id="hunger-bar" class="bar-fill hunger"></div></div>
+          </div>
+          <div class="stat-box">
+            <span class="icon">&#11088;</span>
+            <div class="bar-bg"><div id="xp-bar" class="bar-fill xp"></div></div>
+            <span id="level-txt" style="font-size: 8px; color: #fff; margin-left: -5px;">LVL 1</span>
+          </div>
+          <button id="btn-settings" class="settings-trigger">⚙️</button>
+        </div>
+
+        <!-- Chat Hub -->
+    <button id="chat-toggle" class="floating-btn">
+        <span class="icon">💬</span>
+    </button>
+    <div id="chat-container">
+        <div class="chat-header">COMUNICAÇÃO RADIOSSA</div>
+        <div id="chat-messages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Diga algo aos sobreviventes..." maxlength="100">
+        </div>
+    </div>
+
+    <div id="three-container"></div>
+        <div id="debug-stats" class="hidden">
+            <div class="debug-item">FPS: <span id="stat-fps">0</span></div>
+            <div class="debug-item">MEM: <span id="stat-mem">0</span> MB</div>
+            <div class="debug-item">DRAWS: <span id="stat-draws">0</span></div>
+            <div class="debug-item">TRIS: <span id="stat-tris">0</span></div>
+        </div>
+        <div id="name-tags-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; overflow: hidden;"></div>
+        <canvas id="game-canvas" style="display:none;"></canvas>
+
+        <!-- Log do Sistema -->
+        <div id="game-log" class="game-log">
+            <div id="log-content"></div>
+        </div>
+
+        <!-- Mobile Controls (D-Pad + Action) -->
+        <div id="controls-bar">
+            <!-- D-PAD like GraalOnline (Up, Down, Left, Right and corners) -->
+            <div class="dpad">
+              <button class="dpad-btn diag" id="btn-ul">↖</button>
+              <button class="dpad-btn dir" id="btn-up">↑</button>
+              <button class="dpad-btn diag" id="btn-ur">↗</button>
+              <button class="dpad-btn dir" id="btn-left">←</button>
+              <div class="dpad-center"></div>
+              <button class="dpad-btn dir" id="btn-right">→</button>
+              <button class="dpad-btn diag" id="btn-dl">↙</button>
+              <button class="dpad-btn dir" id="btn-down">↓</button>
+              <button class="dpad-btn diag" id="btn-dr">↘</button>
+            </div>
+
+            <!-- ACTION BUTTON -->
+            <div class="action-btn-container">
+                <button id="btn-action" class="action-btn">🗡️ Caçar</button>
+            </div>
+        </div>
+      </div>
+
+      <!-- GAME OVER SCREEN -->
+      <div id="game-over" class="overlay hidden">
+        <h1 class="title">VOCÊ MORREU</h1>
+        <p class="story-text">A ilha não teve piedade. Tente sobreviver novamente.</p>
+        <button id="btn-restart" class="btn">RECOMEÇAR</button>
+      </div>
+
+      <!-- CONNECTION ERROR SCREEN -->
+      <div id="connection-error" class="overlay hidden">
+        <h1 class="title" style="color: #ff4d4d;">CONEXÃO PERDIDA</h1>
+        <p id="error-msg" class="story-text">Tentando reconetar em 3 segundos...</p>
+        <div id="reconnect-manual" class="hidden">
+           <button id="btn-reconnect" class="btn">TENTAR RECONECTAR AGORA</button>
+        </div>
+      </div>
+
+      <!-- KICK SCREEN -->
+      <div id="kick-screen" class="overlay hidden" style="background: linear-gradient(135deg, #1a0000, #3d0000);">
+        <div style="font-size: 64px; margin-bottom: 20px;">⚡</div>
+        <h1 class="title" style="color: #ff4d4d; font-size: 24px;">VOCÊ FOI EXPULSO</h1>
+        <div style="background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.4); border-radius: 12px; padding: 20px 30px; margin: 20px 0; max-width: 480px; text-align:center;">
+          <p style="color: #aaa; font-size: 11px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">Motivo</p>
+          <p id="kick-reason" style="color: #fff; font-size: 16px; margin: 0; font-family: 'Segoe UI', sans-serif;">---</p>
+        </div>
+        <p id="kick-countdown" class="story-text" style="color: #666; font-size: 12px;">Redirecionando em 5 segundos...</p>
+      </div>
+
+      <!-- BAN SCREEN -->
+      <div id="ban-screen" class="overlay hidden" style="background: linear-gradient(135deg, #0a0014, #1a0033);">
+        <div style="font-size: 64px; margin-bottom: 20px;">🔨</div>
+        <h1 class="title" style="color: #a855f7; font-size: 24px;">ACESSO BANIDO</h1>
+        <div style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.4); border-radius: 12px; padding: 20px 30px; margin: 20px 0; max-width: 480px; width: 90%; text-align:center;">
+          <p style="color: #aaa; font-size: 11px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">Motivo do Banimento</p>
+          <p id="ban-reason" style="color: #fff; font-size: 16px; margin: 0 0 20px 0; font-family: 'Segoe UI', sans-serif;">---</p>
+          <div style="display:flex; gap: 15px; justify-content: center; margin-top: 15px;">
+            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 8px;">
+              <p style="color: #aaa; font-size: 10px; margin: 0 0 4px 0;">DURAÇÃO</p>
+              <p id="ban-duration" style="color: #a855f7; font-size: 18px; font-weight: bold; margin: 0;">---</p>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 8px;">
+              <p style="color: #aaa; font-size: 10px; margin: 0 0 4px 0;">EXPIRA EM</p>
+              <p id="ban-expires" style="color: #a855f7; font-size: 18px; font-weight: bold; margin: 0;">---</p>
+            </div>
+          </div>
+        </div>
+        <p class="story-text" style="color: #555; font-size: 11px;">Entre em contato com o administrador para recorrer.</p>
+      </div>
+
+      <!-- SETTINGS MODAL -->
+      <div id="settings-modal" class="overlay hidden">
+        <div class="modal-card">
+          <h2 class="title" style="font-size: 1.2rem; margin-bottom: 1.5rem;">CONFIGURAÇÕES</h2>
+          
+          <div class="settings-list">
+            <div class="setting-item">
+              <label class="switch-label">
+                <span class="label-text">Ver Limites de Tiles</span>
+                <input type="checkbox" id="check-borders">
+                <span class="custom-check"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <span class="label-text">Modo Multiplayer</span>
+                <input type="checkbox" id="check-multiplayer" checked>
+                <span class="custom-check"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <span class="label-text">Métricas de Desempenho</span>
+                <input type="checkbox" id="check-stats">
+                <span class="custom-check"></span>
+              </label>
+            </div>
+          </div>
+
+          <button id="btn-close-settings" class="btn" style="margin-top: 2rem; padding: 12px 24px; font-size: 0.7rem;">VOLTAR AO JOGO</button>
+        </div>
+      </div>
+
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "zombie-defense",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "vite client",
+    "build": "vite build client",
+    "preview": "vite preview client"
+  },
+  "devDependencies": {
+    "electron": "^41.2.0",
+    "vite": "^8.0.4"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1",
+    "three": "^0.183.2"
+  }
+}

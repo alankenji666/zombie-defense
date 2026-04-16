@@ -1,0 +1,65 @@
+{
+    "animals": [
+        {
+            "id": "chicken",
+            "name": "Galinha",
+            "emoji": "🐓",
+            "hp": 10,
+            "food": 15,
+            "xp": 20,
+            "strength": 0,
+            "hasCollision": true,
+            "drops": [
+                {
+                    "itemId": "meat_raw",
+                    "qty": 1,
+                    "chance": 100
+                }
+            ]
+        },
+        {
+            "id": "pig",
+            "name": "Porco",
+            "emoji": "🐖",
+            "hp": 30,
+            "food": 40,
+            "xp": 50,
+            "strength": 0,
+            "hasCollision": true,
+            "drops": []
+        },
+        {
+            "id": "deer",
+            "name": "Veado",
+            "emoji": "🦌",
+            "hp": 60,
+            "food": 80,
+            "xp": 150,
+            "strength": 0,
+            "hasCollision": true,
+            "drops": []
+        },
+        {
+            "id": "owl",
+            "name": "Coruja",
+            "emoji": "🦉",
+            "hp": 20,
+            "food": 25,
+            "xp": 40,
+            "strength": 0,
+            "hasCollision": false,
+            "drops": []
+        },
+        {
+            "id": "zombie",
+            "name": "Zumbi",
+            "emoji": "🧟",
+            "hp": 50,
+            "food": 0,
+            "xp": 100,
+            "strength": 10,
+            "hasCollision": true,
+            "drops": []
+        }
+    ]
+}

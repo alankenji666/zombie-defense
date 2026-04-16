@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' http://localhost:3000; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';">
+    <title>Survival Island | Admin Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">&#128737;</span>
+                <span class="brand-text">ADMIN HUB</span>
+            </div>
+            
+            <div id="server-status-pill" class="status-pill offline">
+                <span class="dot"></span> STATUS: OFFLINE
+            </div>
+
+            <div class="nav-links">
+                <button class="nav-item active" onclick="showTab('dashboard')">
+                    <span class="icon">&#128200;</span> Dashboard
+                </button>
+                <button class="nav-item" onclick="showTab('mobs')">
+                    <span class="icon">&#128039;</span> Gerenciar Mobs
+                </button>
+                <button class="nav-item" onclick="showTab('items')">
+                    <span class="icon">&#128230;</span> Gerenciar Itens
+                </button>
+                <button class="nav-item" onclick="showTab('players')">
+                    <span class="icon">&#128100;</span> Gerenciar Players
+                </button>
+                <button class="nav-item" onclick="showTab('logs')">
+                    <span class="icon">&#128196;</span> Logs do Servidor
+                </button>
+                <button class="nav-item" onclick="showTab('config')">
+                    <span class="icon">&#9881;</span> Configurações
+                </button>
+                
+                <div class="sidebar-divider" style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                
+                <button class="nav-item" onclick="openMapEditor()" style="background: rgba(99, 102, 241, 0.1); color: #818cf8;">
+                    <span class="icon">&#127912;</span> Editor de Mapa
+                </button>
+            </div>
+
+            <div class="control-actions">
+                <button id="btnOpenGame" class="btn-game" onclick="openGameBrowser()" title="Abrir o jogo no navegador">
+                    &#127918; Abrir Jogo
+                </button>
+                <button id="btnStart" class="btn-primary" onclick="startServer()">&#9654; INICIAR SERVIDOR</button>
+                <button id="btnStop" class="btn-danger hidden" onclick="stopServer()">&#9632; PARAR SERVIDOR</button>
+                <button id="btnRestart" class="btn-outline hidden" onclick="restartServer()">&#8635; REINICIAR</button>
+                <button class="btn-danger btn-small" onclick="resetDB()" style="margin-top:20px;">&#128163; Resetar Banco</button>
+            </div>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="content-area">
+            <!-- DASHBOARD TAB -->
+            <section id="tab-dashboard" class="tab-content active">
+                <div class="header">
+                    <h1>Métricas em Tempo Real</h1>
+                    <p>Monitoramento central da Ilha de Sobrevivência.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="label">Jogadores Online</span>
+                        <span class="value" id="val-players">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Animais Ativos</span>
+                        <span class="value highlight-gold" id="val-animals">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Uso de Memória</span>
+                        <span class="value highlight-blue" id="val-ram">0 MB</span>
+                    </div>
+                </div>
+
+                <div class="survivors-panel">
+                    <h3>&#128101; Sobreviventes na Ilha</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>LVL</th>
+                                    <th>XP</th>
+                                    <th>HP</th>
+                                    <th>Fome</th>
+                                    <th>Posição</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-survivors-body">
+                                <tr><td colspan="6" class="placeholder">Servidor offline ou nenhum jogador...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOGS TAB -->
+            <section id="tab-logs" class="tab-content">
+                <div class="header">
+                    <h1>&#128196; Logs do Servidor</h1>
+                    <p>Histórico completo de eventos do servidor em tempo real.</p>
+                </div>
+                <div class="logs-full-box">
+                    <div class="logs-toolbar">
+                        <button class="btn-outline btn-small" onclick="clearLogs()">&#128465; Limpar Logs</button>
+                        <span id="log-count" style="color:#555; font-size:11px;">0 entradas</span>
+                    </div>
+                    <div id="server-console-full" class="console-output-full">
+                        <span class="log-placeholder">Aguardando inicialização...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MOBS TAB -->
+            <section id="tab-mobs" class="tab-content">
+                <div class="header">
+                    <h1>Gerenciamento de Mobs</h1>
+                    <p>Configure atributos e tabelas de drops das criaturas.</p>
+                </div>
+                <div class="manager-layout">
+                    <div class="sidebar-list" id="mob-list">
+                        <!-- Carregado via JS -->
+                    </div>
+                    <div class="editor-panel" id="mob-editor" style="display:none;">
+                        <div class="editor-header">
+                            <span id="edit-mob-emoji" class="emoji-large">🦌</span>
+                            <div class="title-group">
+                                <h2 id="edit-mob-header">Nome do Mob</h2>
+                                <input type="hidden" id="edit-mob-id">
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label>Nome</label>
+                                <input type="text" id="edit-mob-name">
+                            </div>
+                            <div class="field">
+                                <label>Vida (HP)</label>
+                                <input type="number" id="edit-mob-hp">
+                            </div>
+                            <div class="field">
+                                <label>XP Recompensa</label>
+                                <input type="number" id="edit-mob-xp">
+                            </div>
+                            <div class="field">
+                                <label>Recupera Fome</label>
+                                <input type="number" id="edit-mob-food">
+                            </div>
+                            <div class="field" style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                                <input type="checkbox" id="edit-mob-collision" style="width:20px; height:20px; cursor:pointer;">
+                                <label style="margin:0; cursor:pointer;">Tem Colisão Física</label>
+                            </div>
+                        </div>
+                        
+                        <div class="loot-section">
+                            <h3>🎁 Tabela de Drops (8 Slots)</h3>
+                            <div id="loot-slots-container" class="loot-grid">
+                                <!-- Gerado via JS -->
+                            </div>
+                        </div>
+                        <div class="editor-footer">
+                            <button class="btn-save" onclick="saveMobDetail()">
+                                <span class="btn-save-icon">&#128190;</span> Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ITEMS TAB -->
+            <section id="tab-items" class="tab-content">
+                <div class="header">
+                    <h1>Catálogo de Itens</h1>
+                    <p>Gerencie as propriedades dos itens coletáveis.</p>
+                </div>
+
+                <!-- Filtros de Categoria -->
+                <div id="item-category-filters" class="category-filters">
+                    <button class="cat-filter active" data-cat="all" onclick="filterItemCategory('all')">Todos</button>
+                    <!-- Gerado via JS após carregar categorias -->
+                </div>
+
+                <!-- Busca -->
+                <div class="item-search-bar">
+                    <input type="text" id="item-search-input" oninput="filterItemSearch()" placeholder="🔍 Buscar item por nome ou ID...">
+                </div>
+
+                <div class="manager-layout">
+                    <div class="sidebar-list" id="item-list">
+                        <!-- Carregado via JS -->
+                    </div>
+                    <div class="editor-panel" id="item-editor" style="display:none;">
+                        <div class="editor-header">
+                            <span id="edit-item-emoji" class="emoji-large">🧪</span>
+                            <div class="title-group">
+                                <h2 id="edit-item-header">Nome do Item</h2>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                    <span id="edit-item-id-badge" class="item-id-badge"></span>
+                                    <span id="edit-item-cat-badge" class="item-cat-badge"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="edit-item-id">
+                        </div>
+                        <div class="item-description-box" id="edit-item-description">---</div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label>Nome</label>
+                                <input type="text" id="edit-item-name">
+                            </div>
+                            <div class="field">
+                                <label>&#10084; Recuperar HP</label>
+                                <input type="number" id="edit-item-hp" min="0" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label>&#127829; Recuperar Fome</label>
+                                <input type="number" id="edit-item-hunger" min="0" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label>Peso (Kg)</label>
+                                <input type="text" id="edit-item-weight">
+                            </div>
+                            <div class="field">
+                                <label>⚔️ Dano</label>
+                                <input type="number" id="edit-item-damage" min="0" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label>🛡️ Defesa</label>
+                                <input type="number" id="edit-item-defense" min="0" placeholder="0">
+                            </div>
+                            <div class="field">
+                                <label>🔧 Durabilidade</label>
+                                <input type="number" id="edit-item-durability" min="0" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="item-values-preview">
+                            <div class="preview-card hp-preview">
+                                <span>&#10084;</span>
+                                <span id="preview-hp">0 HP</span>
+                            </div>
+                            <div class="preview-card hunger-preview">
+                                <span>&#127829;</span>
+                                <span id="preview-hunger">0 Fome</span>
+                            </div>
+                            <div class="preview-card damage-preview">
+                                <span>⚔️</span>
+                                <span id="preview-damage">0 Dano</span>
+                            </div>
+                            <div class="preview-card defense-preview">
+                                <span>🛡️</span>
+                                <span id="preview-defense">0 Def</span>
+                            </div>
+                        </div>
+                        <div class="editor-footer">
+                            <button class="btn-save btn-save-catalog" onclick="saveItemDetail()">
+                                <span class="btn-save-icon">&#128214;</span> Salvar no Catálogo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PLAYERS TAB -->
+            <section id="tab-players" class="tab-content">
+                <div class="header">
+                    <h1>Base de Sobreviventes</h1>
+                    <p>Lista geral de todos os jogadores registrados.</p>
+                </div>
+                <div class="toolbar">
+                    <input type="text" id="player-search-input" onkeyup="filterPlayers()" placeholder="Buscar sobrevivente por nome...">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Nome</th>
+                                <th>Nível</th>
+                                <th>XP</th>
+                                <th>Último Login</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-players-body">
+                            <!-- Carregado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- CONFIG TAB -->
+            <section id="tab-config" class="tab-content">
+                <div class="header">
+                    <h1>Configurações Globais</h1>
+                    <p>Controle o comportamento e regras do servidor em tempo real.</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card" style="grid-column: span 1;">
+                        <span class="label">Colisão entre Jogadores</span>
+                        <div style="margin-top:20px;">
+                            <label class="switch-ui">
+                                <input type="checkbox" id="admin-check-collision" onchange="updatePlayerCollision(this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                            <p style="font-size: 11px; color:#666; margin-top:10px;">Quando ativo, um jogador bloqueia o caminho do outro.</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="grid-column: span 2;">
+                        <span class="label">Status das Configurações</span>
+                        <p id="config-sync-status" style="margin-top:20px; font-size:14px; color:#39ff14;">✅ Sincronizado com o Servidor</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL OVERLAYS -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <!-- MODAL DETALHE PLAYER -->
+        <div id="player-detail-modal" class="modal-card hidden">
+            <button class="btn-close" onclick="closeModals()">&times;</button>
+            <div class="modal-body">
+                <div class="profile-header">
+                    <span class="avatar">👤</span>
+                    <div>
+                        <h2 id="det-name">---</h2>
+                        <span class="badge">NÍVEL <span id="det-lvl">0</span></span>
+                    </div>
+                </div>
+                
+                <div class="stats-row">
+                    <div class="mini-card">
+                        <span class="lbl">Vida</span>
+                        <span class="val" id="det-hp">0/100</span>
+                    </div>
+                    <div class="mini-card">
+                        <span class="lbl">Fome</span>
+                        <span class="val" id="det-hunger">0/100</span>
+                    </div>
+                    <div class="mini-card">
+                        <span class="lbl">XP</span>
+                        <span class="val" id="det-xp">0</span>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <label>📍 Localização</label>
+                    <div class="pos-box">
+                        <span id="det-pos">(0, 0)</span>
+                        <button class="btn-resync" onclick="resetPlayerPosition()">RESETAR POSIÇÃO</button>
+                    </div>
+                </div>
+
+                <div class="inventory-section">
+                    <label>🎒 Mochila / Inventário</label>
+                    <div id="det-inventory" class="inv-list"></div>
+                </div>
+
+                <div class="admin-actions-bar">
+                    <button class="btn-action-kick" onclick="openKickModal()">
+                        ⚡ Kickar
+                    </button>
+                    <button class="btn-action-ban" onclick="openBanModal()">
+                        🔨 Banir
+                    </button>
+                    <button class="btn-action-history" onclick="openHistoryModal()">
+                        📋 Histórico
+                    </button>
+                    <button class="btn-action-unban" id="btn-unban" onclick="unbanPlayer()" style="display:none;">
+                        ✅ Desbanir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL EDITOR DE DROP -->
+        <div id="drop-editor-modal" class="modal-card mini hidden">
+            <button class="btn-close" onclick="closeModals()">&times;</button>
+            <div class="modal-body">
+                <h3 id="drop-slot-title">EDITANDO SLOT</h3>
+                <div class="field">
+                    <label>Item</label>
+                    <select id="drop-item-select"></select>
+                </div>
+                <div class="field">
+                    <label>Quantidade</label>
+                    <input type="number" id="drop-qty-input">
+                </div>
+                <div class="field">
+                    <label>Chance (%)</label>
+                    <input type="number" id="drop-chance-input">
+                </div>
+                <button class="btn-save" style="width:100%; margin-top:15px;" onclick="confirmDrop()">
+                    <span class="btn-save-icon">&#10003;</span> Confirmar Slot
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL KICKAR -->
+        <div id="kick-modal" class="modal-card mini hidden">
+            <button class="btn-close" onclick="closeModals()">&times;</button>
+            <div class="modal-body">
+                <div class="modal-action-header kick">
+                    <span>⚡</span>
+                    <div>
+                        <h3>Kickar Jogador</h3>
+                        <p id="kick-target-name" style="color:#ff5e5e; margin:0; font-size:13px;"></p>
+                    </div>
+                </div>
+                <div class="field" style="margin-top:20px;">
+                    <label>Motivo do Kick</label>
+                    <input type="text" id="kick-reason-input" placeholder="Ex: Comportamento impróprio">
+                </div>
+                <button class="btn-action-kick btn-full" style="margin-top:20px;" onclick="confirmKick()">
+                    ⚡ Confirmar Kick
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL BANIR -->
+        <div id="ban-modal" class="modal-card mini hidden">
+            <button class="btn-close" onclick="closeModals()">&times;</button>
+            <div class="modal-body">
+                <div class="modal-action-header ban">
+                    <span>🔨</span>
+                    <div>
+                        <h3>Banir Jogador</h3>
+                        <p id="ban-target-name" style="color:#a855f7; margin:0; font-size:13px;"></p>
+                    </div>
+                </div>
+                <div class="field" style="margin-top:20px;">
+                    <label>Motivo do Banimento</label>
+                    <input type="text" id="ban-reason-input" placeholder="Ex: Uso de trapaças">
+                </div>
+                <div class="field">
+                    <label>Duração (em dias)</label>
+                    <input type="number" id="ban-duration-input" min="1" max="365" value="1" placeholder="1">
+                </div>
+                <button class="btn-action-ban btn-full" style="margin-top:20px;" onclick="confirmBan()">
+                    🔨 Confirmar Banimento
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL HISTÓRICO -->
+        <div id="history-modal" class="modal-card hidden" style="width:580px;">
+            <button class="btn-close" onclick="closeModals()">&times;</button>
+            <div class="modal-body">
+                <div class="modal-action-header history">
+                    <span>📋</span>
+                    <div>
+                        <h3>Histórico de Ações</h3>
+                        <p id="history-target-name" style="color:#00d2ff; margin:0; font-size:13px;"></p>
+                    </div>
+                </div>
+                <div id="active-ban-notice" class="active-ban-notice hidden">
+                    <span>🔨</span>
+                    <div>
+                        <strong>BANIMENTO ATIVO</strong>
+                        <p id="active-ban-info" style="margin:4px 0 0;font-size:12px;"></p>
+                    </div>
+                </div>
+                <div id="history-list" class="history-list"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="renderer.js"></script>
+</body>
+</html>

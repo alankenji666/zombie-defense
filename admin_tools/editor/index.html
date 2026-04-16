@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Island | Map Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../client/src/style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; height: 100%; background: #0a0a0f !important; color: #fff; font-family: 'Inter', sans-serif; }
+        
+        #editor-container { display: flex; height: 100vh; position: relative; }
+        
+        /* LIBRARY SIDEBAR */
+        #library-sidebar {
+            width: 330px;
+            background: rgba(15, 15, 25, 0.98);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            padding: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        #asset-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .asset-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .asset-card:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(5px); }
+        .asset-card.selected { 
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), transparent);
+            border-left: 4px solid #6366f1;
+            padding-left: 8px;
+        }
+
+        .asset-preview { width: 40px; height: 40px; border-radius: 6px; flex-shrink: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .asset-name { font-size: 13px; font-weight: 500; color: #eee; flex: 1; text-align: left; }
+        .asset-tag { font-size: 9px; opacity: 0.5; color: #888; margin-top: 2px; }
+
+        /* INSPECTOR PANEL */
+        #inspector-panel {
+            height: 180px;
+            background: rgba(0,0,0,0.4);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #inspector-viewport { flex: 1; }
+        #inspector-info { padding: 8px 15px; font-size: 10px; color: #888; background: rgba(0,0,0,0.2); }
+
+        /* VIEWPORT */
+        #viewport { flex: 1; position: relative; background: #000; }
+
+        /* TOOLBAR */
+        #toolbar {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            z-index: 200;
+        }
+
+        .tool-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .tool-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .tool-btn.active { background: #6366f1; color: #fff; }
+
+        /* BOTTOM STATS */
+        #bottom-bar {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 200;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* ALTITUDE CONTROLLER */
+        #altitude-control {
+            position: absolute;
+            left: 340px;
+            top: 20px;
+            background: rgba(15, 15, 25, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            z-index: 200;
+            text-align: center;
+        }
+
+        .alt-btn { width: 30px; height: 30px; background: rgba(255,255,255,0.1); border: none; color: #fff; cursor: pointer; border-radius: 4px; margin: 5px 0; }
+        .alt-btn:hover { background: #6366f1; }
+
+        /* SAVE OVERLAY */
+        #save-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        #save-btn:hover { background: #16a34a; transform: translateY(-2px); }
+
+        #settings-btn {
+            position: absolute;
+            top: 75px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div id="editor-container">
+        
+        <!-- SIDEBAR -->
+        <aside id="library-sidebar">
+            <div class="sidebar-header">
+                <span>📦 BIBLIOTECA</span>
+                <span id="asset-count" style="font-size: 0.7rem; opacity: 0.6;">0 itens</span>
+            </div>
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('floor')">Pisos</button>
+                <button class="tab-btn" onclick="switchTab('nature')">Natureza</button>
+                <button class="tab-btn" onclick="switchTab('struct')">Construção</button>
+                <button class="tab-btn" onclick="switchTab('mobs')">Mobs</button>
+            </div>
+
+            <div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <input type="text" id="asset-search" placeholder="🔍 Buscar item..." style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; color: #fff; font-size: 12px; outline: none; transition: all 0.3s; box-sizing: border-box;">
+            </div>
+
+            <div id="asset-list">
+                <!-- Assets carregados dinamicamente -->
+            </div>
+
+            <!-- PAINEL DE INSPEÇÃO 3D -->
+            <div id="inspector-panel">
+                <div id="inspector-viewport"></div>
+                <div id="inspector-info">Selecione um item para inspecionar</div>
+            </div>
+        </aside>
+
+        <!-- VIEWPORT INTERATIVA -->
+        <main id="viewport"></main>
+
+        <!-- FERRAMENTAS FLUTUANTES -->
+        <div id="toolbar">
+            <button class="tool-btn active" id="tool-select" title="Selecionar (S)">🎯</button>
+            <button class="tool-btn" id="tool-brush" title="Pincel (B)">🖌️</button>
+            <button class="tool-btn" id="tool-fill" title="Balde (F)">🪣</button>
+            <button class="tool-btn" id="tool-erase" title="Borracha (E)">🧹</button>
+            <div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+            <button class="tool-btn" id="tool-rotate" onclick="rotateBrush()" title="Rotacionar (R)">🔄</button>
+        </div>
+
+        <div id="altitude-control">
+            <div style="font-size: 10px; opacity: 0.6; margin-bottom: 5px;">ALTURA Z</div>
+            <button class="alt-btn" onclick="changeLayer(1)">▲</button>
+            <div id="layer-val" style="font-weight: bold; margin: 5px 0;">0</div>
+            <button class="alt-btn" onclick="changeLayer(-1)">▼</button>
+        </div>
+
+        <div id="bottom-bar">
+            <div>GRID: <span id="val-grid">100x100</span></div>
+            <div>FPS: <span id="val-fps">0</span></div>
+            <div>OBJETOS: <span id="val-objs">0</span></div>
+            <div>MOUSE: <span id="val-pos">0, 0, 0</span></div>
+        </div>
+
+        <button id="save-btn" onclick="saveMap()">SALVAR MUNDO</button>
+        <button id="settings-btn" onclick="toggleSettings()">⚙️ CONFIG</button>
+
+    </div>
+
+    <div id="loading-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0f; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; font-family:'Outfit',sans-serif;">
+        <div style="font-size:3rem; margin-bottom:20px; animation: pulse 1.5s infinite;">🏗️</div>
+        <div style="font-size:1.2rem; font-weight:bold; letter-spacing:2px;">SURVIVAL ISLAND</div>
+        <div style="margin-top:10px; color:#6366f1;">CARREGANDO EDITOR 3D...</div>
+        <div id="loading-details" style="font-size:10px; opacity:0.5; margin-top:15px; text-transform:uppercase; letter-spacing:1px;">Iniciando motor gráfico...</div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
+
+    <!-- Script principal como módulo -->
+    <script type="module" src="./src/MapEditor.js"></script>
+</body>
+</html>
