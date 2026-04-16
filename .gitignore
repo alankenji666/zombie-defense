@@ -15,6 +15,7 @@ dist-ssr
 # Project specific
 .electron_data
 data/*.db
+public/assets/models/*
 client/public/assets/models/*
 temp_*
 *.zip
