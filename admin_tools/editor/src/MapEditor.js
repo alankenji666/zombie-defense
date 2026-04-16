@@ -145,7 +145,6 @@ function setupScene() {
     camera.position.set(0, 40, 35);
     camera.lookAt(0, 0, 0);
     
-    const canvas = document.getElementById('viewport');
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.shadowMap.enabled = true;
