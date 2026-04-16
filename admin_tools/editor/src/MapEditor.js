@@ -45,6 +45,15 @@ const CATEGORIES = {
     mobs: ['animal-', 'character-']
 };
 
+const THEMES = {
+    survival: ['axe', 'backpack', 'bedroll', 'bottle', 'campfire', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'pickaxe', 'radio', 'raft', 'tent', 'torch', 'watch'],
+    fantasy: ['stall', 'banner', 'barrel', 'well', 'chimney', 'sign', 'cart', 'crane', 'ladder', 'scaffold'],
+    graveyard: ['altar-', 'candle', 'coffin', 'cross', 'crypt', 'gravestone', 'tomb'],
+    nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass'],
+    mobs: ['animal-', 'character-'],
+    platformer: ['block-', 'road-', 'water-', 'coin', 'enemy', 'flag', 'heart', 'key']
+};
+
 let assetInventory = []; // Lista de nomes de arquivos .glb
 let ghostModel = null; // Modelo que segue o mouse
 
@@ -274,11 +283,18 @@ async function loadInventory() {
 function renderAssetList(category) {
     const list = document.getElementById('asset-list');
     const searchVal = document.getElementById('asset-search')?.value.toLowerCase() || "";
+    const selectedTheme = document.getElementById('theme-filter')?.value || "all";
     list.innerHTML = "";
     
-    const filters = CATEGORIES[category];
-    let filtered = assetInventory.filter(name => filters.some(f => name.includes(f)));
+    const categoryFilters = CATEGORIES[category];
+    let filtered = assetInventory.filter(name => categoryFilters.some(f => name.includes(f)));
     
+    // Filtrar por Tema (Novo)
+    if(selectedTheme !== "all") {
+        const themeKeywords = THEMES[selectedTheme] || [];
+        filtered = filtered.filter(name => themeKeywords.some(k => name.toLowerCase().includes(k)));
+    }
+
     // Filtrar por busca (nome técnico ou humanizado)
     if(searchVal) {
         filtered = filtered.filter(name => {
@@ -666,6 +682,8 @@ window.toggleSettings = () => {
         console.log(`[EDITOR] Grid redimensionado para ${newWidth}x${newWidth}`);
     }
 };
+
+window.renderAssetList = renderAssetList;
 
 function updateAssetCount(n) { document.getElementById('asset-count').innerText = `${n} itens`; }
 function updateStats() { document.getElementById('val-objs').innerText = mapData.objects.length; }
