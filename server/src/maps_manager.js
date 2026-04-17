@@ -17,10 +17,10 @@ class MapsManager {
 
     loadMap() {
         if (!fs.existsSync(MAP_PATH)) {
-            // Mapa padrão 100x100 vazio (água)
+            // Mapa padrão 30x30 (fallback seguro — 100x100 causa 10.000 tiles e trava o client)
             return {
-                width: 100,
-                height: 100,
+                width: 30,
+                height: 30,
                 tiles: [],
                 objects: [],
                 specials: [

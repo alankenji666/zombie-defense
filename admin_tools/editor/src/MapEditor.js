@@ -421,25 +421,76 @@ async function updateGhost(name) {
 async function loadCurrentMap() {
     // Usar IPC nativo em vez de fetch
     const response = await ipcRenderer.invoke('map-load');
-    mapData = response.data;
     projectRoot = response.rootPath;
+
+    // Fallback seguro caso o arquivo não exista ou esteja corrompido
+    if (!response.data) {
+        console.warn('[EDITOR] map-load retornou null — usando mapa vazio padrão.');
+        mapData = { width: 30, height: 30, tiles: [], objects: [], specials: [] };
+    } else {
+        mapData = response.data;
+        // Garantir que os campos essenciais existem
+        if (!mapData.objects)  mapData.objects  = [];
+        if (!mapData.tiles)    mapData.tiles    = [];
+        if (!mapData.specials) mapData.specials = [];
+        if (!mapData.biome)    mapData.biome    = 'floresta'; // Padrão
+    }
     
     // Renderizar o que já existe
     rebuildWorld();
 }
 
 function rebuildWorld() {
-    while(objectsContainer.children.length > 0) {
-        objectsContainer.remove(objectsContainer.children[0]);
-    }
+    // Limpar objetos atuais
+    while (objectsContainer.children.length > 0) objectsContainer.remove(objectsContainer.children[0]);
+
+    // Renderizar plano de chão do bioma salvo
+    const oldGround = scene.getObjectByName('_biome_ground');
+    if (oldGround) scene.remove(oldGround);
+
+    const biomeColors = {
+        floresta: 0x4a7a3a,
+        neve:     0xd8e8f0,
+        savana:   0xc8a040,
+        prado:    0x6abf50,
+        pantano:  0x3d5e35
+    };
     
-    // Aqui otimizaremos com InstancedMesh no futuro
-    // Por enquanto, renderizando objetos salvos
-    if(mapData.objects) {
+    const biomeKey = mapData.biome || 'floresta';
+    const groundColor = biomeColors[biomeKey] || 0x4a7a3a;
+    const mapW = (mapData.width || 30) * GRID_SIZE;
+    const mapH = (mapData.height || 30) * GRID_SIZE;
+    
+    const groundGeo = new THREE.PlaneGeometry(mapW, mapH);
+    const groundMat = new THREE.MeshPhongMaterial({ color: groundColor, shininess: 10 });
+    const groundPlane = new THREE.Mesh(groundGeo, groundMat);
+    groundPlane.rotation.x = -Math.PI / 2;
+    groundPlane.position.set(mapW / 2, 0, mapH / 2);
+    groundPlane.name = '_biome_ground';
+    scene.add(groundPlane);
+
+    // Atualizar GridHelper alinhado
+    scene.remove(gridHelper);
+    gridHelper = new THREE.GridHelper(mapW, mapData.width || 30, 0x44aa44, 0x226622);
+    gridHelper.position.set(mapW / 2, 0.06, mapH / 2);
+    scene.add(gridHelper);
+    document.getElementById('val-grid').innerText = `${mapData.width || 30}x${mapData.height || 30}`;
+
+    // Renderizar Objetos (Árvores, Mobs, etc)
+    if (mapData.objects) {
         mapData.objects.forEach(obj => {
-            placeObjectInScene(obj.type === 'tree' ? 'pine.glb' : obj.file, obj.x, obj.y, obj.z, obj.rotation, false);
+            placeObjectInScene(obj.file || 'pine.glb', obj.x, obj.y, obj.z, obj.rotation || 0, false);
         });
     }
+
+    // Renderizar Especiais (Escadas)
+    if (mapData.specials) {
+        mapData.specials.forEach(spec => {
+            const file = spec.type === 'stair' ? 'stairs-wood.glb' : 'box.glb';
+            placeObjectInScene(file, spec.x, spec.y, spec.z, 0, false);
+        });
+    }
+
     updateStats();
 }
 
@@ -742,25 +793,348 @@ window.saveMap = async () => {
 };
 
 window.toggleSettings = () => {
-    const newWidth = prompt("Novo Tamanho do Mapa (Largura/Altura):", mapData.width);
-    if(newWidth) {
-        mapData.width = parseInt(newWidth);
-        mapData.height = parseInt(newWidth);
-        document.getElementById('val-grid').innerText = `${mapData.width}x${mapData.height}`;
-        
-        // Atualizar Grid Visual
-        scene.remove(gridHelper);
-        gridHelper = new THREE.GridHelper(mapData.width * GRID_SIZE, mapData.width, 0x333333, 0x222222);
-        gridHelper.position.y = -0.01;
-        scene.add(gridHelper);
-        console.log(`[EDITOR] Grid redimensionado para ${newWidth}x${newWidth}`);
+    let modal = document.getElementById('settings-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'settings-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+            font-family: 'Inter', sans-serif;
+        `;
+        modal.innerHTML = `
+            <div style="background: linear-gradient(135deg, #0f0f1a, #1a1a2e); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 32px; width: 380px; box-shadow: 0 25px 60px rgba(0,0,0,0.8);">
+                <h2 style="margin: 0 0 8px 0; font-size: 1.3rem; color: #fff;">⚙️ Configurações do Mundo</h2>
+                <p style="color: #666; font-size: 12px; margin: 0 0 24px 0;">Ajuste as propriedades globais do mapa.</p>
+
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Tamanho do Mapa (Grid)</label>
+                <input type="number" id="cfg-size" value="${mapData.width}" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; margin: 6px 0 16px 0;">
+
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Bioma Atual</label>
+                <select id="cfg-biome" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; margin: 6px 0 24px 0; font-size:13px;">
+                    ${Object.entries(BIOMES).map(([k,v]) => `<option value="${k}" ${mapData.biome === k ? 'selected' : ''}>${v.label}</option>`).join('')}
+                </select>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="document.getElementById('settings-modal').style.display='none'" style="flex:1; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#aaa; cursor:pointer;">Cancelar</button>
+                    <button id="cfg-apply-btn" style="flex:2; padding:12px; background: linear-gradient(90deg, #6366f1, #a855f7); border:none; border-radius:8px; color:#fff; cursor:pointer; font-weight:bold;">APLICAR MUDANÇAS</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('cfg-apply-btn').onclick = () => {
+            const newSize = parseInt(document.getElementById('cfg-size').value);
+            const newBiome = document.getElementById('cfg-biome').value;
+            
+            mapData.width = newSize;
+            mapData.height = newSize;
+            mapData.biome = newBiome;
+            
+            modal.style.display = 'none';
+            rebuildWorld();
+            console.log(`[EDITOR] Configurações aplicadas: ${newSize}x${newSize}, Bioma: ${newBiome}`);
+        };
+    } else {
+        document.getElementById('cfg-size').value = mapData.width;
+        document.getElementById('cfg-biome').value = mapData.biome || 'floresta';
     }
+    modal.style.display = 'flex';
 };
 
 window.renderAssetList = renderAssetList;
 
 function updateAssetCount(n) { document.getElementById('asset-count').innerText = `${n} itens`; }
 function updateStats() { document.getElementById('val-objs').innerText = mapData.objects.length; }
+
+// =====================================================
+// GERAÇÃO ALEATÓRIA DE MAPA
+// =====================================================
+
+const BIOMES = {
+    floresta: {
+        label: '🌲 Floresta',
+        ground: ['block-grass-large.glb', 'block-grass.glb'],
+        nature: ['pine.glb', 'tree.glb', 'tree-tall.glb', 'tree-pine.glb', 'tree-crooked.glb', 'tree-high.glb'],
+        extras: ['rock.glb', 'mushrooms.glb', 'trunk.glb', 'trunk-long.glb', 'flower.glb'],
+        treeDensity: 0.12,
+        extrasDensity: 0.06
+    },
+    neve: {
+        label: '❄️ Neve',
+        ground: ['block-snow.glb', 'block-snow-large.glb'],
+        nature: ['tree-pine-snow.glb', 'tree-pine-snow-small.glb', 'tree-snow.glb'],
+        extras: ['rock.glb', 'stones.glb'],
+        treeDensity: 0.10,
+        extrasDensity: 0.04
+    },
+    savana: {
+        label: '🏜️ Savana / Deserto',
+        ground: ['block-sand.glb', 'block-sand-large.glb'],
+        nature: ['cactus.glb', 'rock.glb', 'tree-crooked.glb'],
+        extras: ['stones.glb', 'trunk.glb'],
+        treeDensity: 0.07,
+        extrasDensity: 0.05
+    },
+    prado: {
+        label: '🌸 Prado / Campo',
+        ground: ['block-grass-large.glb', 'block-grass.glb'],
+        nature: ['flower.glb', 'mushrooms.glb', 'grass.glb', 'grass-large.glb'],
+        extras: ['rock.glb', 'stones.glb', 'tree.glb'],
+        treeDensity: 0.04,
+        extrasDensity: 0.12
+    },
+    pantano: {
+        label: '🌿 Pântano',
+        ground: ['block-dirt.glb', 'block-dirt-large.glb', 'block-grass.glb'],
+        nature: ['tree-crooked.glb', 'tree-trunk.glb', 'trunk.glb', 'trunk-long.glb'],
+        extras: ['mushrooms.glb', 'rock.glb', 'flower.glb'],
+        treeDensity: 0.14,
+        extrasDensity: 0.08
+    }
+};
+
+function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function hasAsset(name) {
+    return assetInventory.includes(name);
+}
+
+function pickAvailable(arr) {
+    // Tenta cada item da lista e retorna o primeiro disponível
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.find(hasAsset) || null;
+}
+
+window.openRandomMapModal = () => {
+    // Se o modal já existir, apenas mostra
+    let modal = document.getElementById('random-map-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'random-map-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+            font-family: 'Inter', sans-serif;
+        `;
+        modal.innerHTML = `
+            <div style="background: linear-gradient(135deg, #0f0f1a, #1a1a2e); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 32px; width: 420px; box-shadow: 0 25px 60px rgba(0,0,0,0.8);">
+                <h2 style="margin: 0 0 8px 0; font-size: 1.3rem; background: linear-gradient(90deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🎲 Gerar Mapa Aleatório</h2>
+                <p style="color: #666; font-size: 12px; margin: 0 0 24px 0;">Configura as opções e clique em Gerar. O mapa atual será substituído.</p>
+
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Bioma</label>
+                <select id="rng-biome" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; margin: 6px 0 16px 0; font-size:13px; cursor:pointer;">
+                    ${Object.entries(BIOMES).map(([k,v]) => `<option value="${k}">${v.label}</option>`).join('')}
+                </select>
+
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Tamanho do Mapa</label>
+                <select id="rng-size" style="width:100%; padding:10px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; margin: 6px 0 16px 0; font-size:13px; cursor:pointer;">
+                    <option value="20">Pequeno (20x20)</option>
+                    <option value="30" selected>Médio (30x30)</option>
+                    <option value="50">Grande (50x50)</option>
+                    <option value="70">Enorme (70x70)</option>
+                </select>
+
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Densidade de Árvores/Natureza</label>
+                <div style="display:flex; align-items:center; gap:10px; margin: 6px 0 16px 0;">
+                    <input type="range" id="rng-density" min="1" max="10" value="5" style="flex:1;">
+                    <span id="rng-density-val" style="font-size:12px; color:#a855f7; min-width:20px;">5</span>
+                </div>
+
+                <label style="display:flex; align-items:center; gap:10px; margin-bottom:16px; cursor:pointer;">
+                    <input type="checkbox" id="rng-specials" checked style="width:16px; height:16px;">
+                    <span style="font-size:12px; color:#ccc;">Incluir escadas (portais de andares)</span>
+                </label>
+
+                <label style="display:flex; align-items:center; gap:10px; margin-bottom:24px; cursor:pointer;">
+                    <input type="checkbox" id="rng-autosave" checked style="width:16px; height:16px;">
+                    <span style="font-size:12px; color:#ccc;">Salvar automaticamente após gerar</span>
+                </label>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="document.getElementById('random-map-modal').style.display='none'" style="flex:1; padding:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#aaa; cursor:pointer; font-size:13px;">Cancelar</button>
+                    <button onclick="window.executeGenerateMap()" style="flex:2; padding:12px; background: linear-gradient(90deg, #6366f1, #a855f7); border:none; border-radius:8px; color:#fff; cursor:pointer; font-size:13px; font-weight:bold;">🎲 GERAR AGORA</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Slider label
+        document.getElementById('rng-density').addEventListener('input', (e) => {
+            document.getElementById('rng-density-val').innerText = e.target.value;
+        });
+    }
+    modal.style.display = 'flex';
+};
+
+window.executeGenerateMap = async () => {
+    const biomeKey   = document.getElementById('rng-biome').value;
+    const size       = parseInt(document.getElementById('rng-size').value);
+    const density    = parseInt(document.getElementById('rng-density').value);
+    const addSpecials = document.getElementById('rng-specials').checked;
+    const autoSave   = document.getElementById('rng-autosave').checked;
+
+    document.getElementById('random-map-modal').style.display = 'none';
+
+    const biome = BIOMES[biomeKey];
+    const densityMult = density / 5;
+
+    // Reiniciar dados do mapa
+    mapData = {
+        width: size,
+        height: size,
+        biome: biomeKey,
+        tiles: [],
+        objects: [],
+        specials: addSpecials ? [
+            { type: 'stair', x: Math.floor(size * 0.6), y: Math.floor(size * 0.5), z: 0, targetZ: 1 },
+            { type: 'stair', x: Math.floor(size * 0.6) + 1, y: Math.floor(size * 0.5), z: 1, targetZ: 0 }
+        ] : []
+    };
+
+    // Limpar cena visual
+    while (objectsContainer.children.length > 0) objectsContainer.remove(objectsContainer.children[0]);
+    const oldGround = scene.getObjectByName('_biome_ground');
+    if (oldGround) scene.remove(oldGround);
+
+    // Atualizar grid visual — centralizar no mesmo ponto do plano e dos objetos (quadrante positivo)
+    scene.remove(gridHelper);
+    const mapW = size * GRID_SIZE;
+    const mapH = size * GRID_SIZE;
+    gridHelper = new THREE.GridHelper(mapW, size, 0x44aa44, 0x226622);
+    gridHelper.position.set(mapW / 2, 0.06, mapH / 2);
+    scene.add(gridHelper);
+    document.getElementById('val-grid').innerText = `${size}x${size}`;
+
+    // === PLANO DE CHÃO POR BIOMA (visual no editor) ===
+    // IMPORTANTE: O jogo (World.js) gera o chão proceduralmente via MAP_WIDTH/MAP_HEIGHT.
+    // Tiles individuais em mapData.objects são IGNORADOS pelo servidor/jogo.
+    // Por isso usamos um PlaneGeometry colorido aqui — rápido e sem 900+ LOADER.load calls.
+    const biomeColors = {
+        floresta: 0x4a7a3a,
+        neve:     0xd8e8f0,
+        savana:   0xc8a040,
+        prado:    0x6abf50,
+        pantano:  0x3d5e35
+    };
+    const groundColor = biomeColors[biomeKey] || 0x4a7a3a;
+    const groundGeo = new THREE.PlaneGeometry(mapW, mapH);
+    const groundMat = new THREE.MeshPhongMaterial({ color: groundColor, shininess: 10 });
+    const groundPlane = new THREE.Mesh(groundGeo, groundMat);
+    groundPlane.rotation.x = -Math.PI / 2;
+    groundPlane.position.set(mapW / 2, 0, mapH / 2);
+    groundPlane.name = '_biome_ground';
+    scene.add(groundPlane);
+
+    const btn = document.getElementById('save-btn');
+    btn.innerText = '⏳ GERANDO...';
+    btn.disabled = true;
+
+    // Cache local de modelos para evitar requisições duplicadas
+    const modelCache = {};
+    async function loadCached(file) {
+        if (modelCache[file]) return modelCache[file].clone();
+        return new Promise(resolve => {
+            const p = `file:///${projectRoot}/client/public/assets/models/${file}`.replace(/\\/g, '/');
+            LOADER.load(p, gltf => {
+                modelCache[file] = gltf.scene;
+                resolve(gltf.scene.clone());
+            }, undefined, () => resolve(null));
+        });
+    }
+
+    btn.innerText = '⏳ 30%';
+    await new Promise(r => setTimeout(r, 10));
+
+    // === ÁRVORES / NATUREZA ===
+    const natureTiles = Math.floor(size * size * biome.treeDensity * densityMult);
+    const usedPositions = new Set();
+
+    for (let i = 0; i < natureTiles; i++) {
+        let attempts = 0, px, py;
+        do {
+            px = 1 + Math.floor(Math.random() * (size - 2));
+            py = 1 + Math.floor(Math.random() * (size - 2));
+            attempts++;
+        } while (usedPositions.has(`${px},${py}`) && attempts < 30);
+
+        const key = `${px},${py}`;
+        if (!usedPositions.has(key)) {
+            const treeFile = pickAvailable(biome.nature);
+            if (treeFile) {
+                usedPositions.add(key);
+                const rot = Math.floor(Math.random() * 4) * (Math.PI / 2);
+                mapData.objects.push({ type: 'tree', file: treeFile, x: px, y: py, z: 0, rotation: rot });
+
+                const mesh = await loadCached(treeFile);
+                if (mesh) {
+                    mesh.scale.set(2.0, 2.0, 2.0);
+                    mesh.position.set(px * GRID_SIZE + GRID_SIZE / 2, 1.0, py * GRID_SIZE + GRID_SIZE / 2);
+                    mesh.rotation.y = rot;
+                    mesh.userData = { file: treeFile, x: px, y: py, z: 0 };
+                    mesh.traverse(c => { if (c.isMesh && c.material) { c.material.envMapIntensity = 1.0; c.material.needsUpdate = true; }});
+                    objectsContainer.add(mesh);
+                }
+            }
+        }
+    }
+
+    btn.innerText = '⏳ 70%';
+    await new Promise(r => setTimeout(r, 10));
+
+    // === EXTRAS: pedras, flores, cogumelos ===
+    const extrasTiles = Math.floor(size * size * biome.extrasDensity * densityMult);
+    for (let i = 0; i < extrasTiles; i++) {
+        const ex = 1 + Math.floor(Math.random() * (size - 2));
+        const ey = 1 + Math.floor(Math.random() * (size - 2));
+        const key = `${ex},${ey}`;
+        if (!usedPositions.has(key)) {
+            const extraFile = pickAvailable(biome.extras);
+            if (extraFile) {
+                usedPositions.add(key);
+                mapData.objects.push({ type: 'tree', file: extraFile, x: ex, y: ey, z: 0, rotation: 0 });
+
+                const mesh = await loadCached(extraFile);
+                if (mesh) {
+                    mesh.scale.set(1.8, 1.8, 1.8);
+                    mesh.position.set(ex * GRID_SIZE + GRID_SIZE / 2, 0.8, ey * GRID_SIZE + GRID_SIZE / 2);
+                    mesh.userData = { file: extraFile, x: ex, y: ey, z: 0 };
+                    mesh.traverse(c => { if (c.isMesh && c.material) { c.material.envMapIntensity = 1.0; c.material.needsUpdate = true; }});
+                    objectsContainer.add(mesh);
+                }
+            }
+        }
+    }
+
+    // Renderizar Especiais (Escadas) visualmente agora
+    if (addSpecials) {
+        mapData.specials.forEach(spec => {
+            const file = spec.type === 'stair' ? 'stairs-wood.glb' : 'box.glb';
+            placeObjectInScene(file, spec.x, spec.y, spec.z, 0, true);
+        });
+    }
+
+    updateStats();
+    btn.innerText = '⏳ 95%';
+    await new Promise(r => setTimeout(r, 10));
+
+    if (autoSave) {
+        const result = await ipcRenderer.invoke('map-save', mapData);
+        if (result && result.success) {
+            btn.innerText = '✅ SALVO!';
+        } else {
+            btn.innerText = '⚠️ ERRO AO SALVAR';
+        }
+    } else {
+        btn.innerText = 'SALVAR MUNDO';
+    }
+
+    btn.disabled = false;
+    setTimeout(() => { if (btn.innerText !== 'SALVAR MUNDO') btn.innerText = 'SALVAR MUNDO'; }, 3000);
+    console.log(`[EDITOR] Mapa gerado: ${biomeKey} ${size}x${size} — ${mapData.objects.length} objetos de natureza.`);
+};
 
 function animate() {
     requestAnimationFrame(animate);

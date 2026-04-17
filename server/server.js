@@ -317,6 +317,8 @@ app.post('/api/config', (req, res) => {
 const onlinePlayers = {};
 let MAP_WIDTH = 30;
 let MAP_HEIGHT = 30;
+let biome = 'floresta';
+let objects = [];
 let trees = [];
 let animals = [];
 let specials = [];
@@ -336,10 +338,14 @@ function initWorld() {
 
     MAP_WIDTH = map.width || 30;
     MAP_HEIGHT = map.height || 30;
+    biome = map.biome || 'floresta';
     specials = map.specials || [];
     
-    // Carregar Árvores do Mapa
-    trees = map.objects ? map.objects.filter(o => o.type === 'tree') : [];
+    // Carregar todos os Objetos (Árvores, Pedras, etc)
+    objects = map.objects || [];
+    
+    // Filtro legado para compatibilidade (trees)
+    trees = objects.filter(o => o.type === 'tree');
     
     // Carregar Animais Fixos do Mapa (opcional, se salvos como spawn points)
     animals = [];
@@ -549,7 +555,7 @@ setInterval(() => {
 // =====================================================
 io.on('connection', (socket) => {
     
-    socket.emit('world_init', { trees, specials, MAP_WIDTH, MAP_HEIGHT, serverConfig });
+    socket.emit('world_init', { trees, specials, objects, biome, MAP_WIDTH, MAP_HEIGHT, serverConfig });
     
     socket.on('player_action', (data) => {
         // Propaga a ação para todos os outros players (menos quem enviou)

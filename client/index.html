@@ -158,7 +158,7 @@
 
       <!-- SETTINGS MODAL -->
       <div id="settings-modal" class="overlay hidden">
-        <div class="modal-card">
+        <div class="modal-card" style="max-height: 85vh; overflow-y: auto;">
           <h2 class="title" style="font-size: 1.2rem; margin-bottom: 1.5rem;">CONFIGURAÇÕES</h2>
           
           <div class="settings-list">
@@ -182,6 +182,78 @@
                 <input type="checkbox" id="check-stats">
                 <span class="custom-check"></span>
               </label>
+            </div>
+          </div>
+
+          <!-- DEBUG: DIAGNÓSTICO DE ESCURIDÃO -->
+          <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,0,0.2); padding-top: 1rem;">
+            <p style="font-family: 'Press Start 2P', monospace; font-size: 0.55rem; color: #ffd700; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 1px;">⚠️ Debug: Iluminação / Render</p>
+            <p style="font-size: 0.5rem; color: #888; margin-bottom: 1rem; font-family: sans-serif;">Ative/desative sistemas para descobrir o que está causando o mapa escuro.</p>
+            
+            <div class="settings-list">
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">🌸 Bloom (Post-Processing)</span>
+                  <input type="checkbox" id="check-bloom" checked>
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">💡 Luz Ambiente</span>
+                  <input type="checkbox" id="check-ambient" checked>
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">☀️ Sol (Directional Light)</span>
+                  <input type="checkbox" id="check-sun" checked>
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">🌫️ Névoa (Fog)</span>
+                  <input type="checkbox" id="check-fog" checked>
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">🌑 Sombras (Shadow Map)</span>
+                  <input type="checkbox" id="check-shadows" checked>
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="switch-label">
+                  <span class="label-text" style="color:#a0f0ff;">🎨 Tone Mapping (ACES)</span>
+                  <input type="checkbox" id="check-tonemapping">
+                  <span class="custom-check"></span>
+                </label>
+              </div>
+              <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <span class="label-text" style="color:#a0f0ff;">🔆 Intensidade Luz Ambiente</span>
+                <div style="display:flex; align-items:center; gap: 8px; width: 100%;">
+                  <input type="range" id="range-ambient" min="0" max="3" step="0.1" value="0.8" style="flex:1;">
+                  <span id="range-ambient-val" style="font-size:0.55rem; color:#fff; min-width: 24px;">0.8</span>
+                </div>
+              </div>
+              <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <span class="label-text" style="color:#a0f0ff;">🔆 Intensidade do Sol</span>
+                <div style="display:flex; align-items:center; gap: 8px; width: 100%;">
+                  <input type="range" id="range-sun" min="0" max="5" step="0.1" value="1.2" style="flex:1;">
+                  <span id="range-sun-val" style="font-size:0.55rem; color:#fff; min-width: 24px;">1.2</span>
+                </div>
+              </div>
+              <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <span class="label-text" style="color:#a0f0ff;">🌸 Força do Bloom</span>
+                <div style="display:flex; align-items:center; gap: 8px; width: 100%;">
+                  <input type="range" id="range-bloom" min="0" max="2" step="0.05" value="0.4" style="flex:1;">
+                  <span id="range-bloom-val" style="font-size:0.55rem; color:#fff; min-width: 24px;">0.4</span>
+                </div>
+              </div>
             </div>
           </div>
 

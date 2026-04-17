@@ -61,6 +61,7 @@ let fps = 0;
 // ENGINE CORE
 // = :::::::::::::::::::::::::::::::::::::::::::::::::::
 let scene, camera, renderer, composer;
+let ambientLight, sunLight, bloomPass;
 let entityManager, worldManager;
 let isPlaying = false;
 let currentPlayerName = "Convidado";
@@ -69,7 +70,7 @@ const MOVE_COOLDOWN = 180;
 function initEngine() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb); // Sky blue
-    scene.fog = new THREE.Fog(0x87ceeb, 20, 100);
+    scene.fog = new THREE.Fog(0x87ceeb, 40, 200);
 
     const aspect = window.innerWidth / window.innerHeight;
     const d = 12;
@@ -84,25 +85,32 @@ function initEngine() {
     document.getElementById('three-container').appendChild(renderer.domElement);
 
     // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-    scene.add(ambient);
+    ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+    scene.add(ambientLight);
 
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-    sun.position.set(20, 50, 10);
-    sun.castShadow = true;
-    sun.shadow.camera.left = -30;
-    sun.shadow.camera.right = 30;
-    sun.shadow.camera.top = 30;
-    sun.shadow.camera.bottom = -30;
-    sun.shadow.mapSize.width = 1024;
-    sun.shadow.mapSize.height = 1024;
-    scene.add(sun);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+    hemiLight.position.set(0, 20, 0);
+    scene.add(hemiLight);
+
+    sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    sunLight.position.set(50, 100, 50);
+    sunLight.castShadow = true;
+    sunLight.shadow.camera.left = -100;
+    sunLight.shadow.camera.right = 100;
+    sunLight.shadow.camera.top = 100;
+    sunLight.shadow.camera.bottom = -100;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 500;
+    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    scene.add(sunLight);
 
     // Post Processing
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.4, 0.85);
-    composer.addPass(bloom);
+    bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.4, 0.85);
+    composer.addPass(bloomPass);
 
     // Sub-Managers
     entityManager = new EntityManager(scene, LAYER_HEIGHT, GRID_SIZE);
@@ -297,7 +305,7 @@ function gameLoop(time) {
     if (myPlayer.mesh) {
         const targetX = myPlayer.x * GRID_SIZE;
         const targetZ = myPlayer.y * GRID_SIZE;
-        const targetY = myPlayer.z * LAYER_HEIGHT + 1.5;
+        const targetY = myPlayer.z * LAYER_HEIGHT;
 
         myPlayer.mesh.position.x += (targetX - myPlayer.mesh.position.x) * lerpSpeed;
         myPlayer.mesh.position.z += (targetZ - myPlayer.mesh.position.z) * lerpSpeed;
@@ -432,6 +440,54 @@ document.getElementById('check-stats').addEventListener('change', (e) => {
     const panel = document.getElementById('debug-stats');
     if (gameConfig.showStats) panel.classList.remove('hidden');
     else panel.classList.add('hidden');
+});
+
+// === DEBUG: Iluminação / Render ===
+document.getElementById('check-bloom').addEventListener('change', (e) => {
+    if (bloomPass) bloomPass.enabled = e.target.checked;
+});
+
+document.getElementById('check-ambient').addEventListener('change', (e) => {
+    if (ambientLight) ambientLight.visible = e.target.checked;
+});
+
+document.getElementById('check-sun').addEventListener('change', (e) => {
+    if (sunLight) sunLight.visible = e.target.checked;
+});
+
+document.getElementById('check-fog').addEventListener('change', (e) => {
+    if (scene) scene.fog = e.target.checked ? new THREE.Fog(0x87ceeb, 20, 100) : null;
+});
+
+document.getElementById('check-shadows').addEventListener('change', (e) => {
+    if (renderer) renderer.shadowMap.enabled = e.target.checked;
+    if (sunLight) sunLight.castShadow = e.target.checked;
+});
+
+document.getElementById('check-tonemapping').addEventListener('change', (e) => {
+    if (renderer) {
+        renderer.toneMapping = e.target.checked ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+        renderer.toneMappingExposure = e.target.checked ? 1.0 : 1.0;
+    }
+});
+
+// Sliders
+document.getElementById('range-ambient').addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById('range-ambient-val').innerText = val.toFixed(1);
+    if (ambientLight) ambientLight.intensity = val;
+});
+
+document.getElementById('range-sun').addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById('range-sun-val').innerText = val.toFixed(1);
+    if (sunLight) sunLight.intensity = val;
+});
+
+document.getElementById('range-bloom').addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById('range-bloom-val').innerText = val.toFixed(2);
+    if (bloomPass) bloomPass.strength = val;
 });
 
 document.getElementById('btn-reconnect').addEventListener('click', () => {

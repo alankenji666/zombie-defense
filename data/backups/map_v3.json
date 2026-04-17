@@ -1,0 +1,26 @@
+{
+  "width": 30,
+  "height": 30,
+  "tiles": [],
+  "objects": [
+    { "type": "tree", "file": "pine.glb", "x": 3,  "y": 3,  "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 5,  "y": 8,  "z": 0, "rotation": 1.5707963 },
+    { "type": "tree", "file": "pine.glb", "x": 7,  "y": 4,  "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 2,  "y": 12, "z": 0, "rotation": 3.1415926 },
+    { "type": "tree", "file": "pine.glb", "x": 10, "y": 2,  "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 12, "y": 7,  "z": 0, "rotation": 1.5707963 },
+    { "type": "tree", "file": "pine.glb", "x": 14, "y": 20, "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 20, "y": 5,  "z": 0, "rotation": 3.1415926 },
+    { "type": "tree", "file": "pine.glb", "x": 22, "y": 14, "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 25, "y": 9,  "z": 0, "rotation": 1.5707963 },
+    { "type": "tree", "file": "pine.glb", "x": 8,  "y": 22, "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 18, "y": 25, "z": 0, "rotation": 3.1415926 },
+    { "type": "tree", "file": "pine.glb", "x": 26, "y": 22, "z": 0, "rotation": 0 },
+    { "type": "tree", "file": "pine.glb", "x": 4,  "y": 26, "z": 0, "rotation": 1.5707963 },
+    { "type": "tree", "file": "pine.glb", "x": 28, "y": 15, "z": 0, "rotation": 0 }
+  ],
+  "specials": [
+    { "type": "stair", "x": 18, "y": 15, "z": 0, "targetZ": 1 },
+    { "type": "stair", "x": 19, "y": 15, "z": 1, "targetZ": 0 }
+  ]
+}

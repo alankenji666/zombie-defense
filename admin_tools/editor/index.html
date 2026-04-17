@@ -210,6 +210,25 @@
             cursor: pointer;
             z-index: 1000;
         }
+
+        #random-map-btn {
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1000;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+        }
+        #random-map-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
         
     </style>
 </head>
@@ -285,6 +304,7 @@
 
         <button id="save-btn" onclick="saveMap()">SALVAR MUNDO</button>
         <button id="settings-btn" onclick="toggleSettings()">⚙️ CONFIG</button>
+        <button id="random-map-btn" onclick="openRandomMapModal()">🎲 Mapa Aleatório</button>
 
     </div>
 

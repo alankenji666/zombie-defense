@@ -30,50 +30,109 @@ class WorldManager {
         this.gridHelper = null;
         this.obstacles.clear();
 
-        const MAP_SIZE = data.MAP_WIDTH || 30;
-        this.MAP_WIDTH = MAP_SIZE;
-        this.MAP_HEIGHT = MAP_SIZE;
+        const MAP_SIZE_W = data.MAP_WIDTH || 30;
+        const MAP_SIZE_H = data.MAP_HEIGHT || 30;
+        this.MAP_WIDTH = MAP_SIZE_W;
+        this.MAP_HEIGHT = MAP_SIZE_H;
         
+        // --- 1. CONFIGURAÇÃO DE AMBIENTE (BIOMA) ---
+        const biome = data.biome || 'floresta';
+        const biomeConfigs = {
+            floresta: { ground: 'block-grass-large.glb', sky: 0x87ceeb, fog: 0x87ceeb },
+            neve:     { ground: 'block-snow-large.glb',  sky: 0xe0f0ff, fog: 0xe0f0ff },
+            savana:   { ground: 'block-sand-large.glb',  sky: 0xffe0a0, fog: 0xffe0a0 },
+            prado:    { ground: 'block-grass-large.glb', sky: 0xa0ffda, fog: 0xa0ffda },
+            pantano:  { ground: 'block-dirt-large.glb',  sky: 0x608060, fog: 0x406040 }
+        };
+        const config = biomeConfigs[biome] || biomeConfigs.floresta;
+
+        // Atualizar cor do céu e neblina de forma robusta
+        if (this.scene) {
+            const skyColor = new THREE.Color(config.sky);
+            this.scene.background = skyColor;
+            if (this.scene.fog) {
+                this.scene.fog.color.copy(skyColor);
+                this.scene.fog.near = 50;
+                this.scene.fog.far = 250;
+            }
+        }
+
         if (data.serverConfig) {
             this.playerCollisionEnabled = data.serverConfig.playerCollision;
         }
 
-        // Ground
-        const groundModel = await Assets.load(models.GROUND);
-        for (let x = 0; x < data.MAP_WIDTH; x++) {
-            for (let y = 0; y < data.MAP_HEIGHT; y++) {
-                const tile = groundModel.clone();
-                tile.position.set(x * this.gridSize, 0, y * this.gridSize);
-                // Escala 1.0 para alinhamento perfeito
-                tile.scale.set(1.0, 1.0, 1.0); 
-                this.groundGroup.add(tile);
-            }
-        }
+        // --- 2. RENDERIZAR CHÃO (ESTILO EDITOR) ---
+        const biomeColors = {
+            floresta: 0x4a7a3a,
+            neve:     0xd8e8f0,
+            savana:   0xc8a040,
+            prado:    0x6abf50,
+            pantano:  0x3d5e35
+        };
+        const groundColor = biomeColors[biome] || 0x4a7a3a;
+        const mapW = MAP_SIZE_W * this.gridSize;
+        const mapH = MAP_SIZE_H * this.gridSize;
+        
+        // Centro exato das tiles (para alinhar com o GridHelper)
+        const centerX = ((MAP_SIZE_W - 1) * this.gridSize) / 2;
+        const centerZ = ((MAP_SIZE_H - 1) * this.gridSize) / 2;
 
-        // Criar GridHelper único para representar o mapa
-        const totalSize = MAP_SIZE * this.gridSize;
-        this.gridHelper = new THREE.GridHelper(totalSize, MAP_SIZE, 0x00ff00, 0x00ff00);
-        // O GridHelper é centralizado no (0,0), então movemos para o centro das tiles
-        // Tiles vão de 0 a (size-1)*gridSize. O centro é ((size-1)*gridSize)/2
-        const offset = ((MAP_SIZE - 1) * this.gridSize) / 2;
-        this.gridHelper.position.set(offset, 1.1, offset);
+        const groundGeo = new THREE.PlaneGeometry(mapW, mapH);
+        const groundMat = new THREE.MeshPhongMaterial({ 
+            color: groundColor, 
+            shininess: 10,
+            flatShading: true
+        });
+        const groundPlane = new THREE.Mesh(groundGeo, groundMat);
+        groundPlane.rotation.x = -Math.PI / 2;
+        groundPlane.position.set(centerX, 0, centerZ); // Centralizado nas tiles
+        groundPlane.receiveShadow = true;
+        this.groundGroup.add(groundPlane);
+
+        // Grid Helper (visual para debug se ativado)
+        // Usamos o maior lado para garantir que cubra tudo se não for quadrado
+        const maxDim = Math.max(MAP_SIZE_W, MAP_SIZE_H);
+        const totalSize = maxDim * this.gridSize;
+        this.gridHelper = new THREE.GridHelper(totalSize, maxDim, 0x00ff00, 0x004400);
+        this.gridHelper.position.set(centerX, 0.05, centerZ); // Exatamente no mesmo centro do chão
         this.gridHelper.visible = false;
         this.helpersGroup.add(this.gridHelper);
 
-        // Trees
-        const treeModel = await Assets.load(models.TREE);
-        for (const t of data.trees) {
-            const tree = treeModel.clone();
-            const zCoord = t.z || 0;
-            tree.position.set(t.x * this.gridSize, zCoord * this.layerHeight, t.y * this.gridSize);
-            tree.scale.set(1.8, 1.8, 1.8);
-            tree.rotation.y = Math.random() * Math.PI;
-            this.treesGroup.add(tree);
-            // Registrar obstáculo (x,y,z)
-            this.obstacles.add(`${t.x},${t.y},${t.z || 0}`);
+        // --- 3. RENDERIZAR OBJETOS (Árvores, Pedras, Mobs estáticos) ---
+        const worldObjects = data.objects || [];
+        for (const obj of worldObjects) {
+            const file = obj.file || 'pine.glb';
+            const model = await Assets.load(file);
+            if (model) {
+                const mesh = model.clone();
+                const zCoord = obj.z || 0;
+                mesh.position.set(obj.x * this.gridSize, zCoord * this.layerHeight, obj.y * this.gridSize);
+                
+                if (file.includes('tree') || file.includes('pine') || file.includes('cactus')) {
+                    mesh.scale.set(2.0, 2.0, 2.0);
+                } else {
+                    mesh.scale.set(1.5, 1.5, 1.5);
+                }
+
+                mesh.rotation.y = obj.rotation || 0;
+                
+                // Garantir sombras e iluminação nos objetos
+                mesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        if (child.material) {
+                            child.material.needsUpdate = true;
+                        }
+                    }
+                });
+                
+                this.treesGroup.add(mesh);
+                this.obstacles.add(`${obj.x},${obj.y},${obj.z || 0}`);
+            }
         }
 
-        // Specials (Stairs, etc.)
+        // --- 4. RENDERIZAR ESPECIAIS (Escadas, etc.) ---
         if (data.specials) {
             const stairModel = await Assets.load(models.STAIRS);
             for (const s of data.specials) {

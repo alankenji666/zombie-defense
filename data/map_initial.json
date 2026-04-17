@@ -1,0 +1,1288 @@
+{
+  "width": 30,
+  "height": 30,
+  "biome": "floresta",
+  "tiles": [],
+  "objects": [
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 16,
+      "y": 24,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 13,
+      "y": 3,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 13,
+      "y": 20,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 14,
+      "y": 18,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 25,
+      "y": 1,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 20,
+      "y": 14,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 7,
+      "y": 18,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 2,
+      "y": 5,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 25,
+      "y": 17,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 27,
+      "y": 10,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 19,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 11,
+      "y": 2,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 24,
+      "y": 28,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 18,
+      "y": 27,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 14,
+      "y": 20,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 5,
+      "y": 10,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 18,
+      "y": 19,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 17,
+      "y": 11,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 27,
+      "y": 13,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 24,
+      "y": 25,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 28,
+      "y": 2,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 27,
+      "y": 24,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 6,
+      "y": 17,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 28,
+      "y": 1,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 12,
+      "y": 8,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 18,
+      "y": 14,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 16,
+      "y": 21,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 9,
+      "y": 10,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 6,
+      "y": 11,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 28,
+      "y": 28,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 8,
+      "y": 13,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 24,
+      "y": 7,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 12,
+      "y": 24,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 10,
+      "y": 15,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 22,
+      "y": 18,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 15,
+      "y": 1,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 12,
+      "y": 5,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 3,
+      "y": 23,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 6,
+      "y": 7,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 21,
+      "y": 5,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 14,
+      "y": 4,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 15,
+      "y": 27,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 14,
+      "y": 16,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 26,
+      "y": 17,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 2,
+      "y": 3,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 25,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 6,
+      "y": 2,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 23,
+      "y": 14,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 6,
+      "y": 25,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 22,
+      "y": 13,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 15,
+      "y": 7,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 9,
+      "y": 7,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 19,
+      "y": 25,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 27,
+      "y": 25,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 15,
+      "y": 12,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 20,
+      "y": 3,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 28,
+      "y": 10,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 9,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 14,
+      "y": 22,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 12,
+      "y": 26,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 2,
+      "y": 21,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 7,
+      "y": 16,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 9,
+      "y": 21,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 27,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 16,
+      "y": 7,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 25,
+      "y": 5,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 3,
+      "y": 8,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 26,
+      "y": 6,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 24,
+      "y": 4,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 28,
+      "y": 23,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 18,
+      "y": 10,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 4,
+      "y": 22,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 3,
+      "y": 25,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 24,
+      "y": 5,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 27,
+      "y": 14,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 2,
+      "y": 26,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 6,
+      "y": 26,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 26,
+      "y": 22,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 7,
+      "y": 27,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 5,
+      "y": 22,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 12,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 21,
+      "y": 28,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 1,
+      "y": 17,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 19,
+      "y": 15,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 18,
+      "y": 9,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 8,
+      "y": 10,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 24,
+      "y": 19,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 17,
+      "y": 5,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 21,
+      "y": 1,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 23,
+      "y": 28,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 27,
+      "y": 8,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 7,
+      "y": 24,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 21,
+      "y": 23,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-tall.glb",
+      "x": 18,
+      "y": 6,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 21,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 20,
+      "y": 21,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 20,
+      "y": 4,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 10,
+      "y": 1,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 12,
+      "y": 10,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 28,
+      "y": 25,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 4,
+      "y": 16,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 22,
+      "y": 19,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "pine.glb",
+      "x": 14,
+      "y": 24,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree-pine.glb",
+      "x": 8,
+      "y": 24,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 2,
+      "y": 9,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree.glb",
+      "x": 23,
+      "y": 6,
+      "z": 0,
+      "rotation": 4.71238898038469
+    },
+    {
+      "type": "tree",
+      "file": "tree-crooked.glb",
+      "x": 9,
+      "y": 6,
+      "z": 0,
+      "rotation": 3.141592653589793
+    },
+    {
+      "type": "tree",
+      "file": "tree-high.glb",
+      "x": 11,
+      "y": 14,
+      "z": 0,
+      "rotation": 1.5707963267948966
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 4,
+      "y": 24,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 1,
+      "y": 9,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 21,
+      "y": 6,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 19,
+      "y": 1,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 24,
+      "y": 20,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 19,
+      "y": 12,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 22,
+      "y": 25,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 13,
+      "y": 16,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 14,
+      "y": 13,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 24,
+      "y": 3,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 10,
+      "y": 18,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 1,
+      "y": 8,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 24,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 9,
+      "y": 23,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 17,
+      "y": 25,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 20,
+      "y": 25,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 27,
+      "y": 26,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 11,
+      "y": 1,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 16,
+      "y": 27,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 7,
+      "y": 6,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 6,
+      "y": 6,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 10,
+      "y": 22,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 4,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 23,
+      "y": 22,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 10,
+      "y": 28,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 5,
+      "y": 12,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 4,
+      "y": 27,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 15,
+      "y": 9,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 16,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 16,
+      "y": 23,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 10,
+      "y": 2,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 22,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 14,
+      "y": 6,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 3,
+      "y": 14,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 9,
+      "y": 17,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 1,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 1,
+      "y": 7,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 24,
+      "y": 21,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 14,
+      "y": 11,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 28,
+      "y": 27,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 6,
+      "y": 16,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 17,
+      "y": 28,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 18,
+      "y": 26,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk.glb",
+      "x": 9,
+      "y": 13,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 3,
+      "y": 15,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 2,
+      "y": 10,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 16,
+      "y": 13,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 13,
+      "y": 1,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "mushrooms.glb",
+      "x": 3,
+      "y": 6,
+      "z": 0,
+      "rotation": 0
+    },
+    {
+      "type": "tree",
+      "file": "trunk-long.glb",
+      "x": 27,
+      "y": 20,
+      "z": 0,
+      "rotation": 0
+    }
+  ],
+  "specials": [
+    {
+      "type": "stair",
+      "x": 18,
+      "y": 15,
+      "z": 0,
+      "targetZ": 1
+    },
+    {
+      "type": "stair",
+      "x": 19,
+      "y": 15,
+      "z": 1,
+      "targetZ": 0
+    }
+  ]
+}

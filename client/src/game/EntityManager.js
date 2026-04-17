@@ -69,7 +69,7 @@ class EntityManager {
                 const proxyGeo = new THREE.SphereGeometry(0.3, 8, 8);
                 const proxyMat = new THREE.MeshBasicMaterial({ color: 0x39ff14, wireframe: true, transparent: true, opacity: 0.5 });
                 const proxyMesh = new THREE.Mesh(proxyGeo, proxyMat);
-                proxyMesh.position.set(p.x * this.gridSize, (p.z || 0) * this.layerHeight + 1.5, p.y * this.gridSize);
+                proxyMesh.position.set(p.x * this.gridSize, (p.z || 0) * this.layerHeight, p.y * this.gridSize);
                 this.scene.add(proxyMesh);
 
                 this.others[pId] = { 
@@ -130,7 +130,7 @@ class EntityManager {
             const mesh = entity.mesh;
             const targetX = (p.x || 0) * this.gridSize;
             const targetZ = (p.y || 0) * this.gridSize;
-            const targetY = (p.z || 0) * this.layerHeight + 1.5;
+            const targetY = (p.z || 0) * this.layerHeight;
 
             mesh.position.x += (targetX - mesh.position.x) * lerpSpeed;
             mesh.position.z += (targetZ - mesh.position.z) * lerpSpeed;
@@ -248,7 +248,7 @@ class EntityManager {
             const targetZ = a.y * this.gridSize;
             
             // Altura: Corujas voam mais alto
-            let targetY = (a.z || 0) * this.layerHeight + 1.3;
+            let targetY = (a.z || 0) * this.layerHeight;
             if (entity.mobId === 'owl') targetY += 1.5;
 
             mesh.position.x += (targetX - mesh.position.x) * 0.1;
@@ -402,7 +402,7 @@ class EntityManager {
             // Usamos coordenadas aproximadas do grid para colisão
             const ax = Math.round(a.mesh.position.x / this.gridSize);
             const az = Math.round(a.mesh.position.z / this.gridSize);
-            const az_layer = Math.round((a.mesh.position.y - 1.3) / this.layerHeight);
+            const az_layer = Math.round(a.mesh.position.y / this.layerHeight);
             
             if (ax === x && az === y && az_layer === z) return true;
         }
@@ -415,7 +415,7 @@ class EntityManager {
                 if (!p.mesh) continue;
                 const px = Math.round(p.mesh.position.x / this.gridSize);
                 const pz = Math.round(p.mesh.position.z / this.gridSize);
-                const pz_layer = Math.round((p.mesh.position.y - 1.5) / this.layerHeight);
+                const pz_layer = Math.round(p.mesh.position.y / this.layerHeight);
                 
                 if (px === x && pz === y && pz_layer === z) return true;
             }
