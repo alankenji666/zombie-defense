@@ -21,12 +21,13 @@ let currentItemCategory = 'all';
 
 // --- OPEN GAME IN BROWSER ---
 function openGameBrowser() {
-    if (serverStatus !== 'online') {
-        addLog('[ADMIN] Inicie o servidor antes de abrir o jogo!');
-        return;
-    }
     ipcRenderer.send('open-game-browser');
     addLog('[ADMIN] Abrindo jogo no navegador...');
+}
+
+function openRenderDashboard() {
+    ipcRenderer.send('open-render-dashboard');
+    addLog('[ADMIN] Abrindo Dashboard do Render...');
 }
 
 function openMapEditor() {

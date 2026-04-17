@@ -102,6 +102,10 @@ ipcMain.on('open-game-browser', () => {
     shell.openExternal('http://localhost:3000');
 });
 
+ipcMain.on('open-render-dashboard', () => {
+    shell.openExternal('https://dashboard.render.com/web/srv-d7got028qa3s73cn3usg/logs?r=1h');
+});
+
 // =====================================================
 // MAP EDITOR WINDOW & DATA IPC
 // =====================================================

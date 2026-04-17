@@ -152,7 +152,12 @@ function initNetwork() {
         console.error("[NETWORK] Socket.io não encontrado!");
         return;
     }
-    socket = io();
+
+    const serverChoice = document.getElementById('server-selector').value;
+    const url = serverChoice === 'local' ? "http://localhost:3000" : "https://zombie-defense.onrender.com";
+    
+    console.log(`[NETWORK] Conectando ao servidor: ${url}`);
+    socket = io(url);
 
     socket.on('connect', () => {
         console.log("[NETWORK] Conectado ao servidor. Solicitando entrada...");

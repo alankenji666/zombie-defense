@@ -75,6 +75,18 @@ body, html {
 .btn-game:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--game-glow); opacity: 0.95; }
 .btn-game:active { transform: translateY(0); }
 
+/* Botão do Render (Online) */
+.btn-render {
+    background: linear-gradient(135deg, #a855f7, #6a0dad);
+    color: #fff;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    font-size: 13px !important;
+    letter-spacing: 0.5px;
+}
+.btn-render:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6); opacity: 0.95; }
+.btn-render:active { transform: translateY(0); }
+
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn-danger { background: var(--danger); color: #fff; }

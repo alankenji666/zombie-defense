@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' ws: wss:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https: ws: wss:;">
     <title>Survival Island MVP</title>
     <!-- Imports font -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -36,6 +36,14 @@
         </p>
         <div class="login-box">
             <input type="text" id="player-name-input" placeholder="DIGITE SEU NOME..." maxlength="12">
+            
+            <div style="margin-top: 15px; width: 100%;">
+              <p style="font-size: 8px; color: #888; margin-bottom: 5px;">CONECTAR EM:</p>
+              <select id="server-selector" style="background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #444; padding: 10px; font-family: 'Press Start 2P', monospace; font-size: 8px; width: 100%; cursor: pointer;">
+                <option value="online">🌎 SERVIDOR ONLINE (RENDER)</option>
+                <option value="local">💻 MEU PC (LOCALHOST)</option>
+              </select>
+            </div>
         </div>
         <button id="btn-start" class="btn">ACORDAR</button>
       </div>
