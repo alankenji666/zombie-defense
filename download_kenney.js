@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ASSETS_DIR = path.join(__dirname, 'public', 'assets', 'models');
+const ASSETS_DIR = path.join(__dirname, 'client', 'public', 'assets', 'models');
 if (!fs.existsSync(ASSETS_DIR)) {
     fs.mkdirSync(ASSETS_DIR, { recursive: true });
 }
@@ -132,6 +132,7 @@ async function main() {
         await scrapeAndDownload('platformer-kit');
         await scrapeAndDownload('cube-pets');
         await scrapeAndDownload('graveyard-kit');
+        await scrapeAndDownload('survival-kit');
         console.log("Assets baixados e preparados!");
         validateAssets();
     } catch (err) {

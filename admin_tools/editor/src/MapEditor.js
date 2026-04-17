@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // No Electron, acessamos o ipcRenderer via window.require quando usamos scripts do tipo module
 const ipcRenderer = window.require('electron').ipcRenderer;
@@ -39,21 +40,23 @@ let LOADER; // Será inicializado no init
 
 // Categories mapping (Subsets for performance indexing)
 const CATEGORIES = {
-    floor: ['block-', 'road-', 'water-'],
+    floor: ['block-', 'road-', 'water-', 'floor', 'tile', 'ground'],
     nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass', 'plant'],
-    struct: ['wall', 'roof', 'stairs', 'fence', 'pillar', 'door', 'column', 'brick', 'tent', 'campfire', 'house', 'building'],
-    mobs: ['animal-', 'character-'],
-    items: ['tool-', 'axe', 'pickaxe', 'backpack', 'bedroll', 'bottle', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'radio', 'raft', 'torch', 'watch', 'bucket', 'chest', 'crate']
+    struct: ['wall', 'roof', 'stairs', 'fence', 'pillar', 'door', 'column', 'brick', 'tent', 'campfire', 'house', 'building', 'structure-'],
+    mobs: ['animal-', 'character-', 'enemy-'],
+    items: ['tool-', 'axe', 'pickaxe', 'backpack', 'bedroll', 'bottle', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'radio', 'raft', 'torch', 'watch', 'bucket', 'chest', 'crate', 'saw', 'shovel', 'barrel', 'box', 'sign', 'cart', 'ladder']
 };
 
 const THEMES = {
-    survival: ['axe', 'backpack', 'bedroll', 'bottle', 'campfire', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'pickaxe', 'radio', 'raft', 'tent', 'torch', 'watch', 'tool-'],
-    fantasy: ['stall', 'banner', 'barrel', 'well', 'chimney', 'sign', 'cart', 'crane', 'ladder', 'scaffold'],
-    graveyard: ['altar-', 'candle', 'coffin', 'cross', 'crypt', 'gravestone', 'tomb'],
-    nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass'],
+    survival: ['axe', 'backpack', 'bedroll', 'bottle', 'campfire', 'canoe', 'compass', 'cookpot', 'fish', 'flashlight', 'hammer', 'knife', 'lantern', 'map', 'pickaxe', 'radio', 'raft', 'tent', 'torch', 'watch', 'tool-', 'saw', 'shovel', 'bucket', 'crate', 'barrel', 'box', 'chest', 'structure-', 'wood-'],
+    fantasy: ['stall', 'banner', 'well', 'chimney', 'sign', 'cart', 'crane', 'ladder', 'scaffold', 'floor', 'wall', 'roof', 'door', 'window', 'stairs', 'column', 'pillar'],
+    graveyard: ['altar-', 'candle', 'coffin', 'cross', 'crypt', 'gravestone', 'tomb', 'bench-damaged', 'grave', 'iron-fence'],
+    nature: ['pine', 'tree', 'rock', 'flower', 'mushrooms', 'trunk', 'grass', 'plant'],
     mobs: ['animal-', 'character-'],
     platformer: ['block-', 'road-', 'water-', 'coin', 'enemy', 'flag', 'heart', 'key']
 };
+
+const SMALL_MOBS = ['cat', 'dog', 'bunny', 'chick', 'bird', 'owl', 'rat', 'fox', 'penguin'];
 
 let assetInventory = []; // Lista de nomes de arquivos .glb
 let ghostModel = null; // Modelo que segue o mouse
@@ -110,9 +113,9 @@ function humanizeName(name) {
 async function init() {
     LOADER = new GLTFLoader();
     setupScene();
+    setupInspector(); 
     setupLights();
     setupRaycaster();
-    setupInspector(); // Novo motor 3D para a barra lateral
     
     // Inicia animação imediatamente para evitar tela branca se o resto demorar
     animate();
@@ -157,8 +160,14 @@ function setupScene() {
     
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = false;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     canvas.appendChild(renderer.domElement);
+
+    // Environment map neutro: essencial para MeshStandardMaterial (usado pela Kenney) nao ficar preto
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    scene.environment = pmrem.fromScene(new THREE.RoomEnvironment()).texture;
     
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -183,7 +192,7 @@ function setupScene() {
     });
     const sea = new THREE.Mesh(waterGeo, waterMat);
     sea.rotation.x = -Math.PI / 2;
-    sea.position.y = 0.05; // Levemente acima de zero para não "piscar" com o grid
+    sea.position.y = -1.0; // Agora abaixo de tudo para não cobrir o chão
     scene.add(sea);
 }
 
@@ -193,6 +202,13 @@ function setupInspector() {
 
     inspectorScene = new THREE.Scene();
     inspectorScene.background = null;
+
+    // Luz para o Inspector
+    const inspectorAmbient = new THREE.AmbientLight(0xffffff, 1.5);
+    inspectorScene.add(inspectorAmbient);
+    const inspectorDir = new THREE.DirectionalLight(0xffffff, 1.0);
+    inspectorDir.position.set(5, 10, 5);
+    inspectorScene.add(inspectorDir);
 
     inspectorCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
     inspectorCamera.position.set(4, 4, 4);
@@ -242,19 +258,22 @@ function updateInspector(name) {
 }
 
 function setupLights() {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambient = new THREE.AmbientLight(0xffffff, 2.0); // Brilho total
     scene.add(ambient);
     
-    const dir = new THREE.DirectionalLight(0xffffff, 1);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xbbbbbb, 1.5);
+    hemiLight.position.set(0, 50, 0);
+    scene.add(hemiLight);
+
+    const dir = new THREE.DirectionalLight(0xffffff, 2.0);
     dir.position.set(50, 100, 50);
-    dir.castShadow = true;
-    dir.shadow.camera.left = -100;
-    dir.shadow.camera.right = 100;
-    dir.shadow.camera.top = 100;
-    dir.shadow.camera.bottom = -100;
-    dir.shadow.mapSize.width = 2048;
-    dir.shadow.mapSize.height = 2048;
+    dir.castShadow = false; // Desativar sombras temporariamente para diagnosticar o preto
     scene.add(dir);
+    
+    // Luz frontal para garantir que as faces não fiquem pretas
+    const point = new THREE.PointLight(0xffffff, 2.0);
+    point.position.set(0, 50, 50);
+    scene.add(point);
 }
 
 function setupRaycaster() {
@@ -288,7 +307,7 @@ function renderAssetList(category) {
     list.innerHTML = "";
     
     const categoryFilters = CATEGORIES[category];
-    let filtered = assetInventory.filter(name => categoryFilters.some(f => name.includes(f)));
+    let filtered = assetInventory.filter(name => getCategoryOf(name) === category);
     
     // Filtrar por Tema (Novo)
     if(selectedTheme !== "all") {
@@ -426,50 +445,102 @@ function getObjectAt(x, y, z) {
     return objectsContainer.children.find(c => c.userData.x === x && c.userData.y === y && c.userData.z === z);
 }
 
-function removeObjectAt(x, y, z) {
-    // 1. Remover do Mapa Visual (3D)
-    const toRemove = getObjectAt(x, y, z);
-    if(toRemove) {
-        objectsContainer.remove(toRemove);
-    }
-    
-    // 2. Remover dos Dados (JSON)
-    mapData.objects = mapData.objects.filter(obj => 
-        !(obj.x === x && obj.y === y && obj.z === z)
+function removeObjectAt(x, y, z, filterType = null) {
+    // 1. Localizar o objeto específico nos dados (JSON)
+    const index = mapData.objects.findIndex(obj => 
+        obj.x === x && obj.y === y && obj.z === z && 
+        (!filterType || getCategoryOf(obj.file) === filterType)
     );
-    updateStats();
+
+    if (index !== -1) {
+        const file = mapData.objects[index].file;
+        // 2. Remover do Mapa Visual (3D)
+        const visualObj = objectsContainer.children.find(c => 
+            c.userData.x === x && c.userData.y === y && c.userData.z === z && c.userData.file === file
+        );
+        if(visualObj) objectsContainer.remove(visualObj);
+
+        // 3. Remover dos Dados
+        mapData.objects.splice(index, 1);
+        updateStats();
+    }
+}
+
+function getCategoryOf(file) {
+    const name = file.toLowerCase();
+    if (name.includes('animal-') || name.includes('character-') || name.includes('enemy-')) return 'mobs';
+    if (CATEGORIES.floor.some(f => name.includes(f))) return 'floor';
+    if (CATEGORIES.items.some(f => name.includes(f))) return 'items';
+    if (CATEGORIES.nature.some(f => name.includes(f))) return 'nature';
+    if (CATEGORIES.struct.some(f => name.includes(f))) return 'struct';
+    return 'other';
 }
 
 function placeObjectInScene(file, x, y, z, rotation = 0, isNew = true) {
-    // Se for novo, limpar o que já existe nessa posição para evitar acúmulo
-    if(isNew) removeObjectAt(x, y, z);
+    const category = getCategoryOf(file);
+    
+    // Se for novo, limpar apenas objetos da MESMA categoria ou camada compatível
+    if(isNew) {
+        if(category === 'floor') {
+            removeObjectAt(x, y, z); // Piso limpa tudo no mesmo Z
+        } else if(category === 'mobs' || category === 'items' || category === 'nature') {
+            const isSmall = category !== 'mobs' || SMALL_MOBS.some(s => file.toLowerCase().includes(s));
+            if (isSmall) {
+                // Itens, Natureza e Mobs Pequenos coexistem com o Piso e Estruturas
+                // Apenas removem se houver outro da MESMA categoria (ex: flor troca flor)
+                removeObjectAt(x, y, z, category);
+            } else {
+                // Mobs grandes continuam limpando tudo exceto o Chão
+                removeObjectAt(x, y, z, 'mobs');
+                removeObjectAt(x, y, z, 'struct');
+                removeObjectAt(x, y, z, 'nature');
+                removeObjectAt(x, y, z, 'items');
+            }
+        } else {
+            // Estruturas (Camas, Paredes) removem outras estruturas mas respeitam o Piso
+            removeObjectAt(x, y, z, 'struct');
+            removeObjectAt(x, y, z, 'nature');
+            removeObjectAt(x, y, z, 'items');
+        }
+    }
 
     const modelPath = `file:///${projectRoot}/client/public/assets/models/${file}`.replace(/\\/g, '/');
     LOADER.load(modelPath, (gltf) => {
         const mesh = gltf.scene;
         
+        // Aplicar environment map da cena para garantir que MeshStandardMaterial seja iluminado
+        mesh.traverse(child => {
+            if (child.isMesh && child.material) {
+                child.material.envMapIntensity = 1.0;
+                child.material.needsUpdate = true;
+            }
+        });
         // Configurações de Escala e Offset Y (Sincronizado com Client/World.js)
-        const isFloor = file.startsWith('block-') || file.startsWith('road-') || file.startsWith('water-');
-        const isLarge = file.includes('large');
+        const isFloor = CATEGORIES.floor.some(f => file.includes(f));
         const isNature = CATEGORIES.nature.some(f => file.includes(f));
         const isMob = CATEGORIES.mobs.some(f => file.includes(f));
-        const isSpec = CATEGORIES.struct.some(f => file.includes(f));
+        const isStruct = CATEGORIES.struct.some(f => file.includes(f));
+        const isItem = CATEGORIES.items.some(f => file.includes(f));
         
-        let scale = 1.0;
+        let scale = 2.0; 
         let yOffset = 0;
         
         if(isFloor) {
-            scale = isLarge ? 1.025 : 2.05; // Pequeno aumento (2.5%) p/ sobreposição e fim dos vãos
-            yOffset = 0;
+            scale = file.includes('large') ? 1.025 : 2.05;
+            // Se for um 'block' (cubo), o offset é 0. Se for 'floor' (plano), subimos um pouco
+            yOffset = file.includes('block') ? 0 : 0.45; 
         } else if(isNature) {
-            scale = 1.8;
-            yOffset = 1.5; // Offset para sentar na grama
+            scale = 2.0;
+            yOffset = 1.0;
         } else if(isMob) {
-            scale = 1.5;
-            yOffset = 1.3; // Offset para mobs
-        } else if(isSpec) {
-            scale = 1.5;
-            yOffset = 0; 
+            scale = 1.8;
+            yOffset = 1.0;
+        } else if(isStruct) {
+            scale = 2.2; // Estruturas um pouco maiores
+            yOffset = 1.0;
+        } else if(isItem) {
+            scale = 1.8;
+            yOffset = 1.0;
         }
 
         mesh.scale.set(scale, scale, scale);
@@ -525,7 +596,7 @@ function setupEventListeners() {
         search.addEventListener('input', () => {
             // Re-renderizar categoria atual com filtro
             const activeTab = document.querySelector('.tab-btn.active');
-            const cat = activeTab.onclick.toString().match(/'(.+?)'/)[1];
+            const cat = activeTab.getAttribute('data-category');
             renderAssetList(cat);
         });
     }
