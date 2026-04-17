@@ -167,7 +167,9 @@ function setupScene() {
     // Environment map neutro: essencial para MeshStandardMaterial (usado pela Kenney) nao ficar preto
     const pmrem = new THREE.PMREMGenerator(renderer);
     pmrem.compileEquirectangularShader();
-    scene.environment = pmrem.fromScene(new THREE.RoomEnvironment()).texture;
+    scene.environment = pmrem.fromScene(new RoomEnvironment()).texture;
+    pmrem.dispose();
+
     
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
