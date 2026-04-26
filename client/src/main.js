@@ -49,7 +49,8 @@ let currentData = { players: [], animals: [] };
 let gameConfig = { 
     multiplayer: true,
     multiplayerCollision: false,
-    showStats: false
+    showStats: false,
+    showPosition: false
 };
 
 // Métricas de Desempenho
@@ -360,6 +361,11 @@ function gameLoop(time) {
     
     HUD.updateStats(myPlayer);
     
+    if (gameConfig.showPosition) {
+        const posDisplay = document.getElementById('pos-display');
+        posDisplay.innerText = `X: ${Math.round(myPlayer.x)} Y: ${Math.round(myPlayer.y)}`;
+    }
+    
     // Atualizar Métricas de Desempenho
     if (gameConfig.showStats) {
         frameCount++;
@@ -444,6 +450,26 @@ document.getElementById('check-stats').addEventListener('change', (e) => {
     gameConfig.showStats = e.target.checked;
     const panel = document.getElementById('debug-stats');
     if (gameConfig.showStats) panel.classList.remove('hidden');
+    else panel.classList.add('hidden');
+});
+
+document.getElementById('check-joystick').addEventListener('change', (e) => {
+    const useJoystick = e.target.checked;
+    const dpad = document.getElementById('dpad-container');
+    const joystick = document.getElementById('joystick-zone');
+    if (useJoystick) {
+        dpad.classList.add('hidden');
+        joystick.classList.remove('hidden');
+    } else {
+        dpad.classList.remove('hidden');
+        joystick.classList.add('hidden');
+    }
+});
+
+document.getElementById('check-position').addEventListener('change', (e) => {
+    gameConfig.showPosition = e.target.checked;
+    const panel = document.getElementById('pos-display');
+    if (gameConfig.showPosition) panel.classList.remove('hidden');
     else panel.classList.add('hidden');
 });
 

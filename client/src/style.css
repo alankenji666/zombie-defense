@@ -322,6 +322,32 @@ body {
     background: transparent;
 }
 
+#joystick-zone {
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    position: relative;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+#joystick-knob {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #e94560 0%, #a82c41 100%);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.5);
+    pointer-events: none;
+    transition: transform 0.05s ease-out;
+}
+
 .action-btn-container {
     pointer-events: auto;
 }
@@ -459,7 +485,7 @@ body {
    ===================================================== */
 #chat-toggle {
     position: fixed;
-    bottom: 25px;
+    bottom: 200px;
     left: 20px;
     width: 60px;
     height: 60px;

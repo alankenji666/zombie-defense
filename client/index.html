@@ -94,10 +94,12 @@
             <div id="log-content"></div>
         </div>
 
+        <div id="pos-display" class="hidden" style="position: absolute; top: 75px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; color: #fff; font-size: 8px; z-index: 50; border: 1px solid rgba(255,255,255,0.2);">X: 0 Y: 0</div>
+
         <!-- Mobile Controls (D-Pad + Action) -->
         <div id="controls-bar">
             <!-- D-PAD like GraalOnline (Up, Down, Left, Right and corners) -->
-            <div class="dpad">
+            <div class="dpad hidden" id="dpad-container">
               <button class="dpad-btn diag" id="btn-ul">↖</button>
               <button class="dpad-btn dir" id="btn-up">↑</button>
               <button class="dpad-btn diag" id="btn-ur">↗</button>
@@ -107,6 +109,11 @@
               <button class="dpad-btn diag" id="btn-dl">↙</button>
               <button class="dpad-btn dir" id="btn-down">↓</button>
               <button class="dpad-btn diag" id="btn-dr">↘</button>
+            </div>
+
+            <!-- VIRTUAL JOYSTICK (BOLINHA) -->
+            <div id="joystick-zone">
+                <div id="joystick-knob"></div>
             </div>
 
             <!-- ACTION BUTTON -->
@@ -188,6 +195,20 @@
               <label class="switch-label">
                 <span class="label-text">Métricas de Desempenho</span>
                 <input type="checkbox" id="check-stats">
+                <span class="custom-check"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <span class="label-text">Usar Joystick (Bolinha)</span>
+                <input type="checkbox" id="check-joystick" checked>
+                <span class="custom-check"></span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <label class="switch-label">
+                <span class="label-text">Mostrar Posição</span>
+                <input type="checkbox" id="check-position">
                 <span class="custom-check"></span>
               </label>
             </div>
