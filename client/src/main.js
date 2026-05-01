@@ -183,6 +183,12 @@ function initNetwork() {
         }
     });
 
+    socket.on('chunk_data', (data) => {
+        if (worldManager && data.chunks) {
+            worldManager.updateChunks(data.chunks);
+        }
+    });
+
     socket.on('join_confirmed', (data) => {
         console.log("[NETWORK] Entrada confirmada!");
         beginGame(data);

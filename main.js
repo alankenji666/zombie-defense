@@ -142,13 +142,13 @@ ipcMain.on('open-map-editor', () => {
 
 ipcMain.handle('map-load', async () => {
     return { 
-        data: mapsManager.loadMap(),
+        data: mapsManager.loadChunk(0, 0),
         rootPath: __dirname 
     };
 });
 
 ipcMain.handle('map-save', async (event, mapData) => {
-    const success = mapsManager.saveMap(mapData);
+    const success = mapsManager.saveChunk(0, 0, mapData);
     return { success };
 });
 

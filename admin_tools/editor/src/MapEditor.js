@@ -792,6 +792,65 @@ window.saveMap = async () => {
     }
 };
 
+function createTextSprite(message) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 512;
+    canvas.height = 128;
+    context.fillStyle = 'rgba(0,0,0,0.8)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.font = 'bold 50px Arial';
+    context.fillStyle = '#64ffda';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(message, canvas.width / 2, canvas.height / 2);
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    // Escala maior para ficar bem visível de longe
+    sprite.scale.set(8, 2, 1);
+    sprite.renderOrder = 999; 
+    return sprite;
+}
+
+window.generateCatalogue = () => {
+    if(!confirm("Isso vai limpar o mapa atual para gerar o catálogo. Tem certeza?")) return;
+    mapData.objects = [];
+    while (objectsContainer.children.length > 0) objectsContainer.remove(objectsContainer.children[0]);
+    
+    const items = assetInventory;
+    const cols = Math.ceil(Math.sqrt(items.length));
+    
+    let i = 0;
+    // Aumentar o espaçamento de 2 para 4 tiles entre os itens (evita peso visual e sobreposição)
+    for (let y = 0; y < cols; y++) {
+        for (let x = 0; x < cols; x++) {
+            if (i >= items.length) break;
+            const file = items[i];
+            
+            const px = (x - Math.floor(cols/2)) * 4;
+            const py = (y - Math.floor(cols/2)) * 4;
+            
+            placeObjectInScene(file, px, py, 0, 0, true);
+            
+            // Adiciona a label bem acima do item (y = 5.0)
+            const sprite = createTextSprite(file.replace('.glb', ''));
+            const posOffset = GRID_SIZE / 2;
+            sprite.position.set(px * GRID_SIZE + posOffset, 5.0, py * GRID_SIZE + posOffset);
+            objectsContainer.add(sprite);
+            
+            i++;
+        }
+    }
+    
+    // Atualiza o grid size pra caber tudo com o novo espaçamento
+    mapData.width = cols * 4;
+    mapData.height = cols * 4;
+    rebuildWorld();
+};
+
 window.toggleSettings = () => {
     let modal = document.getElementById('settings-modal');
     if (!modal) {

@@ -229,6 +229,25 @@
             transition: all 0.3s;
         }
         #random-map-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5); }
+
+        #catalogue-btn {
+            position: absolute;
+            top: 165px;
+            right: 20px;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1000;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s;
+        }
+        #catalogue-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217, 119, 6, 0.5); }
         
     </style>
 </head>
@@ -305,6 +324,7 @@
         <button id="save-btn" onclick="saveMap()">SALVAR MUNDO</button>
         <button id="settings-btn" onclick="toggleSettings()">⚙️ CONFIG</button>
         <button id="random-map-btn" onclick="openRandomMapModal()">🎲 Mapa Aleatório</button>
+        <button id="catalogue-btn" onclick="generateCatalogue()">📜 Catálogo de Itens</button>
 
     </div>
 

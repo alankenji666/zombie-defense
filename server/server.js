@@ -317,107 +317,73 @@ app.post('/api/config', (req, res) => {
 
 
 // =====================================================
-// WORLD
+// WORLD & CHUNKS
 // =====================================================
 const onlinePlayers = {};
-let MAP_WIDTH = 30;
-let MAP_HEIGHT = 30;
-let biome = 'floresta';
-let objects = [];
-let trees = [];
+const loadedChunks = {}; // "cx,cy" -> chunkData
 let animals = [];
-let specials = [];
 let survivalTickCounter = 0;
 let serverConfig = {
     playerCollision: false
 };
 
+const CHUNK_SIZE = 30;
+
+function getChunkFor(cx, cy) {
+    const key = `${cx},${cy}`;
+    if (!loadedChunks[key]) {
+        loadedChunks[key] = mapsManager.loadChunk(cx, cy);
+    }
+    return loadedChunks[key];
+}
+
+function getSurroundingChunks(cx, cy) {
+    const chunks = [];
+    for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+            chunks.push(getChunkFor(cx + i, cy + j));
+        }
+    }
+    return chunks;
+}
 
 function initWorld() {
-    const map = mapsManager.loadMap();
-    if (!map) {
-        // Fallback para geração aleatória se o mapa estiver corrompido
-        generateRandomWorld();
-        return;
-    }
-
-    MAP_WIDTH = map.width || 30;
-    MAP_HEIGHT = map.height || 30;
-    biome = map.biome || 'floresta';
-    specials = map.specials || [];
+    // Carrega o chunk 0,0 por padrão
+    getChunkFor(0, 0);
     
-    // Carregar todos os Objetos (Árvores, Pedras, etc)
-    objects = map.objects || [];
-    
-    // Filtro legado para compatibilidade (trees)
-    trees = objects.filter(o => o.type === 'tree');
-    
-    // Carregar Animais Fixos do Mapa (opcional, se salvos como spawn points)
-    animals = [];
-    if (map.objects) {
-        map.objects.filter(o => o.type === 'animal').forEach(a => {
-            const type = mobsData.animals.find(m => m.id === a.mobId);
-            if (type) {
-                animals.push({
-                    id: Math.random().toString(36).substr(2, 9),
-                    name: type.name,
-                    x: a.x,
-                    y: a.y,
-                    z: a.z || 0,
-                    emoji: type.emoji,
-                    foodValue: type.food,
-                    xpReward: type.xp,
-                    hp: type.hp,
-                    maxHp: type.hp,
-                    mobId: type.id
-                });
-            }
-        });
-    }
-
-    // Se o mapa estiver muito vazio, spawnar alguns animais aleatórios para manter a vida
+    // Spawn inicial de animais
     if (animals.length < 5) {
         spawnAnimals(15 - animals.length);
     }
     
-    console.log(`[WORLD] Mapa carregado: ${MAP_WIDTH}x${MAP_HEIGHT}. Árvores: ${trees.length}, Mobs: ${animals.length}`);
-}
-
-function generateRandomWorld() {
-    MAP_WIDTH = 30;
-    MAP_HEIGHT = 30;
-    trees = [];
-    for (let i = 0; i < 40; i++) {
-        trees.push({
-            x: Math.floor(Math.random() * (MAP_WIDTH - 2)) + 1,
-            y: Math.floor(Math.random() * (MAP_HEIGHT - 2)) + 1,
-            z: 0,
-            emoji: '🌴',
-            type: 'tree'
-        });
-    }
-    specials = [
-        { type: 'stair', x: 18, y: 15, z: 0, targetZ: 1 },
-        { type: 'stair', x: 19, y: 15, z: 1, targetZ: 0 }
-    ];
-    animals = [];
-    spawnAnimals(15);
+    console.log(`[WORLD] Servidor inciado no modo Chunks Contínuos.`);
 }
 
 function spawnAnimals(count) {
     if (!mobsData.animals || mobsData.animals.length === 0) return;
     
+    // Pegar chunks onde há jogadores para spawnar perto deles
+    const activeChunks = new Set();
+    for (let sid in onlinePlayers) {
+        const p = onlinePlayers[sid];
+        activeChunks.add(`${Math.floor(p.x/CHUNK_SIZE)},${Math.floor(p.y/CHUNK_SIZE)}`);
+    }
+    if (activeChunks.size === 0) activeChunks.add("0,0");
+
+    const chunkKeys = Array.from(activeChunks);
+
     for (let i = 0; i < count; i++) {
+        const randChunk = chunkKeys[Math.floor(Math.random() * chunkKeys.length)];
+        const [cx, cy] = randChunk.split(',').map(Number);
         const type = mobsData.animals[Math.floor(Math.random() * mobsData.animals.length)];
         
-        // Buscar posição livre
         let rx, ry;
         let attempts = 0;
         let found = false;
         
         while(attempts < 50) {
-            rx = Math.floor(Math.random() * (MAP_WIDTH - 2)) + 1;
-            ry = Math.floor(Math.random() * (MAP_HEIGHT - 2)) + 1;
+            rx = (cx * CHUNK_SIZE) + Math.floor(Math.random() * CHUNK_SIZE);
+            ry = (cy * CHUNK_SIZE) + Math.floor(Math.random() * CHUNK_SIZE);
             if (isWalkable(rx, ry, 0, null, type.hasCollision ?? true)) {
                 found = true;
                 break;
@@ -444,16 +410,19 @@ function spawnAnimals(count) {
 }
 
 function isWalkable(x, y, z, socketId, hasCollision = true) {
-    // 1. Limites do Mapa (Sempre bloqueia)
-    if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return false;
+    // Mapa agora é infinito, sem limites rígidos de borda (MAP_WIDTH/HEIGHT removidos)
+    
+    // Encontrar o chunk correspondente à posição
+    const cx = Math.floor(x / CHUNK_SIZE);
+    const cy = Math.floor(y / CHUNK_SIZE);
+    const chunk = getChunkFor(cx, cy);
 
-    // Se o mob NÃO tem colisão física (Ex: voadores), ele ignora árvores e outros mobs
     if (hasCollision) {
-        // 2. Árvores
-        const hasTree = trees.some(t => t.x === x && t.y === y && t.z === z);
-        if (hasTree) return false;
+        // 2. Objetos/Árvores estáticos do chunk
+        const hasObstacle = chunk.objects.some(o => o.x === x && o.y === y && (o.z || 0) === z);
+        if (hasObstacle) return false;
 
-        // 3. Outros Monstros (Ignora se o mob não tem colisão física, ex: coruja)
+        // 3. Animais Globais
         const hasMonster = animals.some(a => {
             if (a.x !== x || a.y !== y || a.z !== z) return false;
             const type = mobsData.animals.find(m => m.id === a.mobId);
@@ -461,7 +430,7 @@ function isWalkable(x, y, z, socketId, hasCollision = true) {
         });
         if (hasMonster) return false;
 
-        // 4. Outros Jogadores (Se habilitado)
+        // 4. Outros Jogadores
         if (serverConfig.playerCollision) {
             for (let sid in onlinePlayers) {
                 if (sid === socketId) continue;
@@ -560,7 +529,8 @@ setInterval(() => {
 // =====================================================
 io.on('connection', (socket) => {
     
-    socket.emit('world_init', { trees, specials, objects, biome, MAP_WIDTH, MAP_HEIGHT, serverConfig });
+    socket.emit('world_init', { serverConfig });
+
     
     socket.on('player_action', (data) => {
         // Propaga a ação para todos os outros players (menos quem enviou)
@@ -629,13 +599,20 @@ io.on('connection', (socket) => {
                 name,
                 level: playerData.level || 1,
                 xp: playerData.xp || 0,
-                inventory: playerData.inventory || []
+                inventory: playerData.inventory || [],
+                lastCx: Math.floor(playerData.x / CHUNK_SIZE),
+                lastCy: Math.floor(playerData.y / CHUNK_SIZE)
             };
 
             io.emit('server_log', `[GAME] 🟢 Jogador ${name} conectou (Lvl ${onlinePlayers[socket.id].level})`);
             io.emit('player_connected', name);
 
             socket.emit('join_confirmed', onlinePlayers[socket.id]);
+            
+            // Send initial chunks
+            const cx = onlinePlayers[socket.id].lastCx;
+            const cy = onlinePlayers[socket.id].lastCy;
+            socket.emit('chunk_data', { chunks: getSurroundingChunks(cx, cy) });
         } catch (err) {
             console.error(err);
         }
@@ -655,8 +632,20 @@ io.on('connection', (socket) => {
             p.z = pos.z || 0;
             p.direction = pos.direction;
 
+            // Verificar mudança de Chunk
+            const currentCx = Math.floor(p.x / CHUNK_SIZE);
+            const currentCy = Math.floor(p.y / CHUNK_SIZE);
+            
+            if (currentCx !== p.lastCx || currentCy !== p.lastCy) {
+                p.lastCx = currentCx;
+                p.lastCy = currentCy;
+                // Envia novos vizinhos quando muda de chunk
+                socket.emit('chunk_data', { chunks: getSurroundingChunks(currentCx, currentCy) });
+            }
+
             // Verificar interação com escadas
-            specials.forEach(s => {
+            const chunk = getChunkFor(currentCx, currentCy);
+            chunk.specials.forEach(s => {
                 if (s.type === 'stair' && s.x === p.x && s.y === p.y && s.z === p.z) {
                     p.z = s.targetZ;
                     socket.emit('server_log', `[MOVIMENTO] Você ${s.targetZ > s.z ? 'subiu' : 'desceu'} para a Camada ${p.z}`);
